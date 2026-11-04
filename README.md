@@ -24,6 +24,14 @@ Repositori kustomisasi modul ERP & SIMRS karya Dessy Rahmawati Chairullina (chai
 - **src/keuangan/DlgValidasiJurnalHPPJMDokterWeb.java** ➕ **src/resources/validasi_jurnal_hpp_jm.html**: Modul validasi dan rekonsiliasi jurnal HPP JM Dokter.
 - **src/resources/mapping_coa.html**: Antarmuka mapping Chart of Accounts (COA) visual.
 
-## Dokumentasi & UAT
+### 3. Modul Rekam Medis (Diagnosa & Rencana Asuhan Keperawatan SDKI, SLKI, SIKI)
+- **src/rekammedis/MasterDiagnosaKeperawatan.java & .form**: Modul master diagnosa keperawatan terpadu (gabungan master diagnosa dan rencana, auto-number ID dan kode rencana, serta fitur pemilihan warna kustom entitas).
+- **src/rekammedis/MasterRencanaKeperawatan.java & .form**: Modul master rencana keperawatan dengan pengalihan tombol master ke MasterDiagnosaKeperawatan.
+- **src/rekammedis/DlgDiagnosaKeperawatan.java & .form**: Dialog transaksi asuhan keperawatan pasien rawat jalan/inap dengan fitur auto-commit cell editing dan penyimpanan multi-baris batch evaluasi masalah keperawatan.
+- **src/fungsi/WarnaTableSDKI.java**: Kelas renderer tabel pewarnaan entitas keperawatan SDKI/SLKI/SIKI.
+- **docs/PANDUAN_PENGISIAN_MASTER_DIAGNOSA_KEPERAWATAN.docx**: Buku panduan pengisian master diagnosa keperawatan untuk perawat.
+
+## Dokumentasi & Logbook
 - **docs/UAT_DlgJurnalTransaksiWeb_DlgPostingJurnalWeb.docx & .pdf**: Dokumen User Acceptance Testing (UAT) Jurnal Transaksi & Posting Jurnal.
 - **docs/Logbook_Fitur_JurnalTransaksiWeb_PostingJurnalWeb.docx & .pdf**: Logbook pengembangan fitur Jurnal Web.
+- **documentation_log/logs/**: Catatan riwayat rekayasa perangkat lunak dan arsitektur modul.
