@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Validasi &amp; Rekonsiliasi Jurnal HPP &amp; Jasa Medis Dokter</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f1f5f9;
+            color: #1e293b;
+            padding: 12px;
+            font-size: 13px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 24px);
+        }
+        .header {
+            background: linear-gradient(135deg, #0f172a, #1e3a8a);
+            color: white;
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        .header h1 { font-size: 17px; font-weight: 700; letter-spacing: 0.3px; }
+        .header .user-info { font-size: 12px; opacity: 0.9; margin-right: 12px; }
+        .btn-keluar {
+            background: #ef4444; border: none; color: white;
+            padding: 5px 14px; border-radius: 5px; font-weight: 600; font-size: 12px;
+            cursor: pointer; transition: 0.15s;
+        }
+        .btn-keluar:hover { background: #dc2626; }
+
+        /* KPI Cards */
+        .kpi-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+            padding: 12px 18px 6px 18px;
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+            flex-shrink: 0;
+        }
+        .kpi-card {
+            background: white;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 8px 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+        .kpi-title { font-size: 11px; font-weight: 600; color: #64748b; text-transform: uppercase; }
+        .kpi-value { font-size: 16px; font-weight: 700; color: #0f172a; margin-top: 2px; }
+        .kpi-card.hpp .kpi-value { color: #d97706; }
+        .kpi-card.jm .kpi-value { color: #2563eb; }
+        .kpi-card.pending .kpi-value { color: #dc2626; }
+        .kpi-card.posted .kpi-value { color: #16a34a; }
+
+        /* Filter Bar */
+        .filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px 14px;
+            padding: 10px 18px;
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        .filter-group { display: flex; align-items: center; gap: 4px; }
+        .filter-group label { font-weight: 600; font-size: 12px; color: #334155; }
+        .filter-group input, .filter-group select {
+            padding: 5px 8px;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            font-size: 12px;
+            background: white;
+        }
+        .filter-group input:focus, .filter-group select:focus {
+            outline: none; border-color: #2563eb; ring: 1px solid #2563eb;
+        }
+        .time-select { width: 44px; padding: 4px 2px !important; text-align: center; }
+
+        .btn-action {
+            border: none; padding: 6px 14px; border-radius: 5px;
+            font-weight: 600; font-size: 12px; cursor: pointer; transition: 0.15s;
+            display: inline-flex; align-items: center; gap: 4px;
+        }
+        .btn-primary { background: #2563eb; color: white; }
+        .btn-primary:hover { background: #1d4ed8; }
+        .btn-success { background: #16a34a; color: white; }
+        .btn-success:hover { background: #15803d; }
+        .btn-warning { background: #d97706; color: white; }
+        .btn-warning:hover { background: #b45309; }
+        .btn-secondary { background: #64748b; color: white; }
+        .btn-secondary:hover { background: #475569; }
+
+        /* Table Wrapper */
+        .table-wrap {
+            flex: 1;
+            overflow: auto;
+            position: relative;
+            background: white;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+        thead th {
+            position: sticky;
+            top: 0;
+            background: #1e293b;
+            color: #f8fafc;
+            padding: 8px 10px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 11px;
+            letter-spacing: 0.3px;
+            z-index: 10;
+            border-right: 1px solid #334155;
+        }
+        tbody tr {
+            border-bottom: 1px solid #e2e8f0;
+            transition: background 0.1s;
+        }
+        tbody tr:hover { background: #f8fafc; }
+        tbody tr.selected { background: #eff6ff; }
+        td {
+            padding: 6px 10px;
+            color: #334155;
+            border-right: 1px solid #f1f5f9;
+        }
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+        .text-bold { font-weight: 600; }
+
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 9999px;
+            font-size: 11px;
+            font-weight: 600;
+            text-align: center;
+        }
+        .badge-hpp { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+        .badge-jm { background: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; }
+        .badge-posted { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+        .badge-pending { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+
+        /* Footer Bar */
+        .footer-bar {
+            padding: 10px 18px;
+            background: #f8fafc;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        .footer-left { display: flex; gap: 8px; align-items: center; }
+        .footer-right { display: flex; gap: 8px; align-items: center; }
+
+        /* Toast */
+        .toast {
+            position: fixed; bottom: 20px; right: 20px;
+            background: #0f172a; color: white; padding: 10px 18px;
+            border-radius: 6px; font-size: 13px; font-weight: 500;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+            display: none; z-index: 9999;
+        }
+        .toast.show { display: block; }
+        .toast.success { background: #16a34a; }
+        .toast.error { background: #dc2626; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Header -->
+    <div class="header">
+        <div style="display:flex; align-items:center; gap:10px;">
+            <h1>Validasi &amp; Rekonsiliasi Jurnal HPP &amp; Jasa Medis Dokter</h1>
+        </div>
+        <div style="display:flex; align-items:center;">
+            <span class="user-info" id="userInfo">User: -</span>
+            <button class="btn-keluar" id="btnKeluar">Keluar</button>
+        </div>
+    </div>
+
+    <!-- KPI Summary Cards -->
+    <div class="kpi-row">
+        <div class="kpi-card">
+            <div class="kpi-title">Total Transaksi</div>
+            <div class="kpi-value" id="kpiTotalTrx">0 Item</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-title">Total Tarif Billing</div>
+            <div class="kpi-value" id="kpiTotalBilling">Rp 0</div>
+        </div>
+        <div class="kpi-card hpp">
+            <div class="kpi-title">Total HPP Obat/BHP</div>
+            <div class="kpi-value" id="kpiTotalHpp">Rp 0</div>
+        </div>
+        <div class="kpi-card jm">
+            <div class="kpi-title">Total Beban JM Dokter</div>
+            <div class="kpi-value" id="kpiTotalJm">Rp 0</div>
+        </div>
+        <div class="kpi-card pending">
+            <div class="kpi-title">Belum Terjurnal</div>
+            <div class="kpi-value" id="kpiPending">0 Item (Rp 0)</div>
+        </div>
+        <div class="kpi-card posted">
+            <div class="kpi-title">Sudah Terjurnal</div>
+            <div class="kpi-value" id="kpiPosted">0 Item (Rp 0)</div>
+        </div>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="filter-bar">
+        <div class="filter-group">
+            <label>Periode Dari:</label>
+            <input type="date" id="tgl1">
+            <select id="jam1" class="time-select"></select><span>:</span>
+            <select id="mnt1" class="time-select"></select><span>:</span>
+            <select id="dtk1" class="time-select"></select>
+        </div>
+        <div class="filter-group">
+            <label>s.d.:</label>
+            <input type="date" id="tgl2">
+            <select id="jam2" class="time-select"></select><span>:</span>
+            <select id="mnt2" class="time-select"></select><span>:</span>
+            <select id="dtk2" class="time-select"></select>
+        </div>
+        <div class="filter-group">
+            <label>Modul:</label>
+            <select id="filterMode">
+                <option value="Semua">Semua (HPP &amp; JM)</option>
+                <option value="HPP">HPP Farmasi (Obat &amp; BHP)</option>
+                <option value="JM">Jasa Medis Dokter</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <label>Unit:</label>
+            <select id="filterUnit">
+                <option value="Semua">Semua Unit</option>
+                <option value="Ralan">Rawat Jalan</option>
+                <option value="Ranap">Rawat Inap</option>
+                <option value="Operasi">Operasi (OK)</option>
+                <option value="Laborat">Laboratorium</option>
+                <option value="Radiologi">Radiologi</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <label>Dokter:</label>
+            <select id="filterDokter" style="max-width:180px;">
+                <option value="Semua">Semua Dokter</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <label>Status Jurnal:</label>
+            <select id="filterStatus">
+                <option value="Semua">Semua</option>
+                <option value="Belum" selected>Belum Terjurnal</option>
+                <option value="Sudah">Sudah Terjurnal</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <label>Cari:</label>
+            <input type="text" id="keyword" placeholder="No Rawat / RM / Pasien / Item..." style="width:160px;">
+        </div>
+        <button class="btn-action btn-primary" id="btnCari">Cari Data</button>
+        <button class="btn-action btn-secondary" id="btnReset">Reset</button>
+    </div>
+
+    <!-- Table Container -->
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width:40px; text-align:center;"><input type="checkbox" id="checkAll"></th>
+                    <th style="width:60px; text-align:center;">STATUS</th>
+                    <th style="width:90px; text-align:center;">MODUL</th>
+                    <th style="width:130px;">WAKTU TRX</th>
+                    <th style="width:140px;">NO. RAWAT</th>
+                    <th style="width:180px;">NO. RM &amp; PASIEN</th>
+                    <th style="width:130px;">PENJAMIN</th>
+                    <th style="width:100px;">UNIT</th>
+                    <th style="width:180px;">DOKTER / DPJP</th>
+                    <th style="min-width:220px;">NAMA OBAT / TINDAKAN</th>
+                    <th style="width:60px; text-align:right;">QTY</th>
+                    <th style="width:110px; text-align:right;">TARIF JUAL</th>
+                    <th style="width:110px; text-align:right;">HPP / JM DOKTER</th>
+                    <th style="width:140px;">AKUN DEBET</th>
+                    <th style="width:140px;">AKUN KREDIT</th>
+                    <th style="width:140px;">NO. JURNAL</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <tr><td colspan="16" class="text-center" style="padding:24px; color:#94a3b8;">Silakan tentukan periode lalu klik "Cari Data"</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Footer Bar -->
+    <div class="footer-bar">
+        <div class="footer-left">
+            <span id="selectedCount" style="font-weight:600; color:#2563eb;">0 item dipilih</span>
+            <button class="btn-action btn-success" id="btnPostingJurnal" style="margin-left:8px;">
+                Validasi &amp; Posting ke Jurnal
+            </button>
+        </div>
+        <div class="footer-right">
+            <button class="btn-action btn-warning" id="btnExportExcel">Export CSV / Excel</button>
+            <button class="btn-action btn-secondary" id="btnCetak">Cetak Laporan</button>
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+    let rawData = [];
+    let dokterList = [];
+
+    // Elements
+    const tgl1 = document.getElementById('tgl1');
+    const tgl2 = document.getElementById('tgl2');
+    const jam1 = document.getElementById('jam1'), mnt1 = document.getElementById('mnt1'), dtk1 = document.getElementById('dtk1');
+    const jam2 = document.getElementById('jam2'), mnt2 = document.getElementById('mnt2'), dtk2 = document.getElementById('dtk2');
+    const filterMode = document.getElementById('filterMode');
+    const filterUnit = document.getElementById('filterUnit');
+    const filterDokter = document.getElementById('filterDokter');
+    const filterStatus = document.getElementById('filterStatus');
+    const keyword = document.getElementById('keyword');
+    const btnCari = document.getElementById('btnCari');
+    const btnReset = document.getElementById('btnReset');
+    const checkAll = document.getElementById('checkAll');
+    const tableBody = document.getElementById('tableBody');
+    const selectedCount = document.getElementById('selectedCount');
+    const btnPostingJurnal = document.getElementById('btnPostingJurnal');
+    const btnExportExcel = document.getElementById('btnExportExcel');
+    const btnCetak = document.getElementById('btnCetak');
+    const btnKeluar = document.getElementById('btnKeluar');
+
+    // Init dates and times
+    function initDateTime() {
+        const today = new Date();
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
+        const dd = String(today.getDate()).padStart(2, '0');
+        const strDate = `${yyyy}-${mm}-${dd}`;
+        tgl1.value = strDate;
+        tgl2.value = strDate;
+
+        for (let i = 0; i < 24; i++) {
+            const v = String(i).padStart(2, '0');
+            jam1.add(new Option(v, v));
+            jam2.add(new Option(v, v));
+        }
+        for (let i = 0; i < 60; i++) {
+            const v = String(i).padStart(2, '0');
+            mnt1.add(new Option(v, v));
+            mnt2.add(new Option(v, v));
+            dtk1.add(new Option(v, v));
+            dtk2.add(new Option(v, v));
+        }
+        jam1.value = "00"; mnt1.value = "00"; dtk1.value = "00";
+        jam2.value = "23"; mnt2.value = "59"; dtk2.value = "59";
+    }
+
+    function formatNumber(n) {
+        return parseFloat(n || 0).toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+    }
+
+    function showToast(msg, type = 'success') {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.className = 'toast show ' + type;
+        setTimeout(() => { t.className = 'toast'; }, 3500);
+    }
+
+    // Load Data
+    function cariData() {
+        tableBody.innerHTML = '<tr><td colspan="16" class="text-center" style="padding:24px;">Memuat data rekonsiliasi...</td></tr>';
+        btnCari.disabled = true;
+
+        const payload = {
+            tglAwal: `${tgl1.value} ${jam1.value}:${mnt1.value}:${dtk1.value}`,
+            tglAkhir: `${tgl2.value} ${jam2.value}:${mnt2.value}:${dtk2.value}`,
+            mode: filterMode.value,
+            unit: filterUnit.value,
+            kdDokter: filterDokter.value,
+            statusJurnal: filterStatus.value,
+            keyword: keyword.value.trim()
+        };
+
+        if (typeof javaApp !== 'undefined' && javaApp.loadRekonsiliasi) {
+            javaApp.loadRekonsiliasi(JSON.stringify(payload));
+        } else {
+            // Mock fallback untuk visual demo
+            setTimeout(() => {
+                const demo = [
+                    {
+                        modul: 'HPP',
+                        waktu: '2026-09-11 08:15:20',
+                        no_rawat: '2026/09/11/000001',
+                        no_rkm_medis: '012345',
+                        nm_pasien: 'SUWARDI',
+                        penjamin: 'BPJS Kesehatan',
+                        unit: 'Rawat Jalan',
+                        nm_dokter: 'dr. Ahmad, Sp.PD',
+                        item: 'Paracetamol 500mg Tab',
+                        qty: 10,
+                        tarif_jual: 15000,
+                        nilai_hpp_jm: 9000,
+                        kd_debet: '5.1.02.01',
+                        kd_kredit: '1.1.05.01',
+                        status_jurnal: 'Belum',
+                        no_jurnal: ''
+                    },
+                    {
+                        modul: 'JM',
+                        waktu: '2026-09-11 08:30:10',
+                        no_rawat: '2026/09/11/000001',
+                        no_rkm_medis: '012345',
+                        nm_pasien: 'SUWARDI',
+                        penjamin: 'BPJS Kesehatan',
+                        unit: 'Rawat Jalan',
+                        nm_dokter: 'dr. Ahmad, Sp.PD',
+                        item: 'Pemeriksaan Dokter Spesialis Penyakit Dalam',
+                        qty: 1,
+                        tarif_jual: 125000,
+                        nilai_hpp_jm: 85000,
+                        kd_debet: '5.1.01.01',
+                        kd_kredit: '2.1.03.01',
+                        status_jurnal: 'Belum',
+                        no_jurnal: ''
+                    }
+                ];
+                terimaDataRekonsiliasi(JSON.stringify(demo));
+            }, 600);
+        }
+    }
+
+    window.terimaDataRekonsiliasi = function(jsonStr) {
+        btnCari.disabled = false;
+        try {
+            rawData = JSON.parse(jsonStr) || [];
+            renderTable();
+        } catch (e) {
+            tableBody.innerHTML = `<tr><td colspan="16" class="text-center" style="color:red;">Gagal membaca data: ${e.message}</td></tr>`;
+        }
+    };
+
+    function renderTable() {
+        if (!rawData || rawData.length === 0) {
+            tableBody.innerHTML = '<tr><td colspan="16" class="text-center" style="padding:24px; color:#94a3b8;">Tidak ada data ditemukan untuk filter ini.</td></tr>';
+            updateKPI(0, 0, 0, 0, 0, 0, 0, 0);
+            updateSelection();
+            return;
+        }
+
+        let html = '';
+        let totBilling = 0, totHpp = 0, totJm = 0;
+        let countPending = 0, valPending = 0;
+        let countPosted = 0, valPosted = 0;
+
+        rawData.forEach((row, idx) => {
+            const isHpp = row.modul === 'HPP';
+            const isPosted = row.status_jurnal === 'Sudah' && row.no_jurnal;
+            const nilai = parseFloat(row.nilai_hpp_jm || 0);
+            const billing = parseFloat(row.tarif_jual || 0);
+
+            totBilling += billing;
+            if (isHpp) totHpp += nilai;
+            else totJm += nilai;
+
+            if (isPosted) {
+                countPosted++;
+                valPosted += nilai;
+            } else {
+                countPending++;
+                valPending += nilai;
+            }
+
+            const badgeModul = isHpp ? '<span class="badge badge-hpp">HPP Obat</span>' : '<span class="badge badge-jm">JM Dokter</span>';
+            const badgeStatus = isPosted ? '<span class="badge badge-posted">Terjurnal</span>' : '<span class="badge badge-pending">Belum</span>';
+
+            html += `
+                <tr data-index="${idx}">
+                    <td class="text-center">
+                        <input type="checkbox" class="row-check" data-index="${idx}" ${isPosted ? 'disabled' : ''}>
+                    </td>
+                    <td class="text-center">${badgeStatus}</td>
+                    <td class="text-center">${badgeModul}</td>
+                    <td>${row.waktu || '-'}</td>
+                    <td><strong>${row.no_rawat || '-'}</strong></td>
+                    <td>${row.no_rkm_medis || '-'} - ${row.nm_pasien || '-'}</td>
+                    <td>${row.penjamin || '-'}</td>
+                    <td>${row.unit || '-'}</td>
+                    <td>${row.nm_dokter || '-'}</td>
+                    <td>${row.item || '-'}</td>
+                    <td class="text-right">${row.qty || 1}</td>
+                    <td class="text-right">Rp ${formatNumber(billing)}</td>
+                    <td class="text-right text-bold" style="color:${isHpp ? '#d97706' : '#2563eb'};">Rp ${formatNumber(nilai)}</td>
+                    <td><code>${row.kd_debet || '-'}</code></td>
+                    <td><code>${row.kd_kredit || '-'}</code></td>
+                    <td>${row.no_jurnal ? `<strong>${row.no_jurnal}</strong>` : '<span style="color:#94a3b8;">-</span>'}</td>
+                </tr>
+            `;
+        });
+
+        tableBody.innerHTML = html;
+        updateKPI(rawData.length, totBilling, totHpp, totJm, countPending, valPending, countPosted, valPosted);
+        attachEvents();
+        updateSelection();
+    }
+
+    function updateKPI(totalTrx, totBilling, totHpp, totJm, countPending, valPending, countPosted, valPosted) {
+        document.getElementById('kpiTotalTrx').textContent = `${totalTrx} Item`;
+        document.getElementById('kpiTotalBilling').textContent = `Rp ${formatNumber(totBilling)}`;
+        document.getElementById('kpiTotalHpp').textContent = `Rp ${formatNumber(totHpp)}`;
+        document.getElementById('kpiTotalJm').textContent = `Rp ${formatNumber(totJm)}`;
+        document.getElementById('kpiPending').textContent = `${countPending} Item (Rp ${formatNumber(valPending)})`;
+        document.getElementById('kpiPosted').textContent = `${countPosted} Item (Rp ${formatNumber(valPosted)})`;
+    }
+
+    function attachEvents() {
+        document.querySelectorAll('.row-check').forEach(cb => {
+            cb.addEventListener('change', function() {
+                const tr = this.closest('tr');
+                if (this.checked) tr.classList.add('selected');
+                else tr.classList.remove('selected');
+                updateSelection();
+            });
+        });
+    }
+
+    function updateSelection() {
+        const checked = document.querySelectorAll('.row-check:checked');
+        selectedCount.textContent = `${checked.length} item dipilih`;
+        btnPostingJurnal.disabled = checked.length === 0;
+    }
+
+    checkAll.addEventListener('change', function() {
+        const isChecked = this.checked;
+        document.querySelectorAll('.row-check:not(:disabled)').forEach(cb => {
+            cb.checked = isChecked;
+            const tr = cb.closest('tr');
+            if (isChecked) tr.classList.add('selected');
+            else tr.classList.remove('selected');
+        });
+        updateSelection();
+    });
+
+    // Posting Jurnal Batch
+    btnPostingJurnal.addEventListener('click', function() {
+        const checkedBoxes = document.querySelectorAll('.row-check:checked');
+        if (checkedBoxes.length === 0) {
+            alert('Silakan pilih (centang) item yang ingin diposting ke jurnal.');
+            return;
+        }
+
+        const itemsToPost = [];
+        let missingCoa = 0;
+        checkedBoxes.forEach(cb => {
+            const idx = parseInt(cb.dataset.index);
+            const item = rawData[idx];
+            if (!item.kd_debet || !item.kd_kredit) {
+                missingCoa++;
+            }
+            itemsToPost.push(item);
+        });
+
+        if (missingCoa > 0) {
+            alert(`Peringatan: Ada ${missingCoa} transaksi yang belum memiliki Akun Debet/Kredit lengkap.\nHarap pastikan pengaturan COA sudah lengkap terlebih dahulu.`);
+            return;
+        }
+
+        if (!confirm(`Konfirmasi posting ${itemsToPost.length} item transaksi ke Buku Besar/Jurnal Harian resmi?`)) {
+            return;
+        }
+
+        btnPostingJurnal.disabled = true;
+        btnPostingJurnal.textContent = 'Memposting...';
+
+        if (typeof javaApp !== 'undefined' && javaApp.postingJurnalBatch) {
+            javaApp.postingJurnalBatch(JSON.stringify(itemsToPost));
+        } else {
+            showToast(`Demo: Berhasil memposting ${itemsToPost.length} item`, 'success');
+            btnPostingJurnal.disabled = false;
+            btnPostingJurnal.textContent = 'Validasi & Posting ke Jurnal';
+        }
+    });
+
+    window.postingJurnalSelesai = function(sukses, pesan, count) {
+        btnPostingJurnal.disabled = false;
+        btnPostingJurnal.textContent = 'Validasi & Posting ke Jurnal';
+        if (sukses) {
+            showToast(pesan, 'success');
+            cariData();
+        } else {
+            alert('Gagal posting: ' + pesan);
+        }
+    };
+
+    // Export CSV
+    btnExportExcel.addEventListener('click', function() {
+        if (!rawData || rawData.length === 0) {
+            alert('Tidak ada data untuk diexport.');
+            return;
+        }
+        let csv = "STATUS,MODUL,WAKTU TRX,NO RAWAT,NO RM,NAMA PASIEN,PENJAMIN,UNIT,DOKTER,ITEM,QTY,TARIF JUAL,NILAI HPP/JM,AKUN DEBET,AKUN KREDIT,NO JURNAL\n";
+        rawData.forEach(r => {
+            csv += `"${r.status_jurnal}","${r.modul}","${r.waktu}","${r.no_rawat}","${r.no_rkm_medis}","${r.nm_pasien}","${r.penjamin}","${r.unit}","${r.nm_dokter}","${r.item}",${r.qty},${r.tarif_jual},${r.nilai_hpp_jm},"${r.kd_debet}","${r.kd_kredit}","${r.no_jurnal}"\n`;
+        });
+
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a");
+        const url = URL.createObjectURL(blob);
+        link.setAttribute("href", url);
+        link.setAttribute("download", `Rekonsiliasi_HPP_JM_${tgl1.value}_sd_${tgl2.value}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    });
+
+    // Cetak
+    btnCetak.addEventListener('click', function() {
+        window.print();
+    });
+
+    // Populate dokter list
+    window.terimaDaftarDokter = function(jsonStr) {
+        try {
+            const list = JSON.parse(jsonStr) || [];
+            while (filterDokter.options.length > 1) filterDokter.remove(1);
+            list.forEach(d => {
+                filterDokter.add(new Option(d.nm_dokter, d.kd_dokter));
+            });
+        } catch (e) {}
+    };
+
+    // Event buttons
+    btnCari.addEventListener('click', cariData);
+    btnReset.addEventListener('click', () => {
+        initDateTime();
+        filterMode.value = 'Semua';
+        filterUnit.value = 'Semua';
+        filterDokter.value = 'Semua';
+        filterStatus.value = 'Belum';
+        keyword.value = '';
+        cariData();
+    });
+
+    btnKeluar.addEventListener('click', () => {
+        if (typeof javaApp !== 'undefined' && javaApp.keluarForm) {
+            javaApp.keluarForm();
+        } else {
+            window.close();
+        }
+    });
+
+    // Init onload
+    initDateTime();
+    if (typeof javaApp !== 'undefined' && javaApp.getUserInfo) {
+        document.getElementById('userInfo').textContent = 'User: ' + (javaApp.getUserInfo() || '-');
+    }
+    if (typeof javaApp !== 'undefined' && javaApp.getDaftarDokter) {
+        javaApp.getDaftarDokter();
+    }
+</script>
+</body>
+</html>

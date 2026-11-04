@@ -1,0 +1,1297 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buku Besar (General Ledger)</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        html, body { height: 100%; overflow: hidden; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Verdana, sans-serif;
+            background: #f0f4f4;
+            color: #333;
+            font-size: 13px;
+            padding: 8px 10px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Container & Panels */
+        .panel {
+            background: #fff;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            padding: 8px 12px;
+            margin-bottom: 6px;
+            flex-shrink: 0;
+        }
+
+        /* Header Style following transaksiharianweb */
+        .header-panel {
+            background: #5c8687;
+            color: #ffffff;
+            border-radius: 6px;
+            padding: 8px 14px;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+        }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .header-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: 0.3px;
+        }
+        .header-badge {
+            background: rgba(255,255,255,0.22);
+            color: #ffffff;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        .header-nav {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-left: 10px;
+        }
+        .btn-header-nav {
+            background: rgba(255,255,255,0.18);
+            border: 1px solid rgba(255,255,255,0.35);
+            color: #ffffff;
+            padding: 4px 11px;
+            border-radius: 5px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .btn-header-nav:hover {
+            background: rgba(255,255,255,0.32);
+            border-color: #ffffff;
+            transform: translateY(-1px);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .user-info {
+            font-size: 11px;
+            color: #e5f1f1;
+            margin-right: 6px;
+            font-weight: 500;
+        }
+        .btn-win-action {
+            background: rgba(255,255,255,0.18);
+            border: 1px solid rgba(255,255,255,0.35);
+            color: #ffffff;
+            width: 26px;
+            height: 26px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.15s;
+        }
+        .btn-win-action:hover {
+            background: rgba(255,255,255,0.35);
+        }
+        .btn-win-close {
+            background: #e74c3c;
+            border: 1px solid #c0392b;
+            color: white;
+            width: 26px;
+            height: 26px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.15s;
+        }
+        .btn-win-close:hover {
+            background: #c0392b;
+        }
+
+        /* Tab Navigation Bar */
+        .tabs {
+            margin: 0;
+            border-bottom: 2px solid #5c8687;
+            flex-shrink: 0;
+        }
+        .tab {
+            display: inline-block;
+            padding: 6px 16px;
+            background: #dde7e7;
+            color: #4b5563;
+            font-weight: 600;
+            font-size: 12px;
+            cursor: pointer;
+            border-radius: 6px 6px 0 0;
+            margin-right: 3px;
+            transition: background 0.15s, color 0.15s;
+            border: 1px solid #cbd5e1;
+            border-bottom: none;
+        }
+        .tab.on {
+            background: #5c8687;
+            color: #ffffff;
+            border-color: #5c8687;
+        }
+
+        /* Filter Controls */
+        .filter-panel {
+            border-radius: 0 0 6px 6px;
+            border-top: none;
+            padding: 8px 12px;
+            margin-bottom: 6px;
+        }
+        .fg {
+            display: inline-block;
+            margin: 0 8px 3px 0;
+            vertical-align: middle;
+        }
+        label {
+            font-weight: 600;
+            color: #4b5563;
+            margin-right: 4px;
+            font-size: 11px;
+        }
+        input[type=text], select {
+            padding: 3px 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 12px;
+            height: 26px;
+            background: #fff;
+            color: #333;
+            outline: none;
+        }
+        input[type=text]:focus, select:focus {
+            border-color: #5c8687;
+            box-shadow: 0 0 0 2px rgba(92,134,135,0.2);
+        }
+
+        /* Buttons */
+        button {
+            border: 0;
+            padding: 4px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 600;
+            height: 26px;
+            transition: 0.15s;
+        }
+        .btn-primary {
+            background: #007bff;
+            color: #fff;
+        }
+        .btn-primary:hover {
+            background: #0069d9;
+        }
+        .btn-excel {
+            background: #16a34a;
+            color: #fff;
+        }
+        .btn-excel:hover {
+            background: #15803d;
+        }
+        .btn-kembali {
+            background: #e2e8f0;
+            color: #334155;
+            border: 1px solid #cbd5e1;
+        }
+        .btn-kembali:hover {
+            background: #cbd5e1;
+        }
+        .btn-det {
+            background: #fff;
+            color: #2563eb;
+            border: 1px solid #bfd3f5;
+            padding: 3px 10px;
+            font-size: 11px;
+            height: 22px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .btn-det:hover {
+            background: #eff6ff;
+            border-color: #2563eb;
+        }
+
+        /* KPI Cards */
+        .kpi-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 6px;
+            flex-shrink: 0;
+        }
+        .kpi-card {
+            flex: 1;
+            background: white;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            padding: 6px 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .kpi-card .kpi-label {
+            font-size: 11px;
+            color: #6b7280;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+        .kpi-card .kpi-value {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1f2937;
+        }
+        .kpi-card.saldo-awal { border-left: 4px solid #3b82f6; }
+        .kpi-card.debet { border-left: 4px solid #0284c7; }
+        .kpi-card.kredit { border-left: 4px solid #d97706; }
+        .kpi-card.saldo-akhir { border-left: 4px solid #166534; }
+        .kpi-card.saldo-akhir .kpi-value { color: #166534; }
+        .kpi-card.total-coa { border-left: 4px solid #5c8687; }
+
+        /* Banner Akun Terpilih di Tab B */
+        .banner-akun-b {
+            background: #eef3f3;
+            border: 1px solid #bfd3d4;
+            border-radius: 6px;
+            padding: 7px 12px;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+        .banner-akun-b .info-akun {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .badge-rek {
+            background: #5c8687;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: 700;
+            font-size: 12px;
+        }
+        .badge-normal-d {
+            background: #eff6ff;
+            color: #1d4ed8;
+            border: 1px solid #bfdbfe;
+            padding: 2px 7px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .badge-normal-k {
+            background: #fffbeb;
+            color: #b45309;
+            border: 1px solid #fde68a;
+            padding: 2px 7px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        /* Table Scroll Wrapper */
+        .wrap {
+            background: #fff;
+            border: 1px solid #d1d5db;
+            overflow: auto;
+            flex: 1;
+            min-height: 0;
+            border-radius: 4px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+        th, td {
+            padding: 6px 8px;
+            border: 1px solid #e5e7eb;
+            text-align: left;
+            vertical-align: middle;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: 12px;
+        }
+        th {
+            background: #5c8687;
+            color: #ffffff;
+            font-weight: 600;
+            position: -webkit-sticky;
+            position: sticky;
+            top: 0;
+            z-index: 5;
+            font-size: 12px;
+        }
+        td.num, th.num { text-align: right; }
+        td.ctr, th.ctr { text-align: center; }
+        tr:hover td { background: #f8fafc; }
+        tr.tot td {
+            background: #e3eded;
+            font-weight: bold;
+            color: #1f4f50;
+            border-top: 2px solid #5c8687;
+        }
+        .badge-no-jurnal {
+            background: #eff6ff;
+            color: #1e40af;
+            border: 1px solid #bfdbfe;
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-weight: 700;
+            font-size: 11px;
+        }
+        .msg-empty {
+            text-align: center;
+            padding: 30px;
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        /* Resizer */
+        .resizer {
+            -webkit-user-select: none;
+            width: 5px;
+            height: 100%;
+            position: absolute;
+            right: 0;
+            top: 0;
+            cursor: col-resize;
+            user-select: none;
+        }
+        .resizer:hover { background: rgba(255,255,255,0.55); }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(255, 255, 255, 0.7);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        .loading-overlay.active { display: flex; }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #5c8687;
+            border-radius: 50%;
+            width: 38px;
+            height: 38px;
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 10px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed; bottom: 18px; right: 18px;
+            background: #1f2937; color: white;
+            padding: 8px 16px; border-radius: 6px; font-size: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transform: translateY(80px); opacity: 0;
+            transition: all 0.3s; z-index: 10001;
+        }
+        .toast.show { transform: translateY(0); opacity: 1; }
+        .toast.success { background: #166534; }
+        .toast.error { background: #dc2626; }
+
+        /* Modal Overlay */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none; align-items: center; justify-content: center;
+            z-index: 10000;
+        }
+        .modal-overlay.active { display: flex; }
+
+        @media print {
+            body { background: white; padding: 0; overflow: visible; }
+            .header-panel, .tabs, .filter-panel, .banner-akun-b, .btn-kembali, .header-right { display: none !important; }
+            .wrap { overflow: visible !important; border: none !important; height: auto !important; }
+            table { width: 100% !important; }
+            th, td { border: 1px solid #999 !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Hijau SIMRS Khanza (transaksiharianweb) -->
+    <div class="header-panel">
+        <div class="header-left">
+            <span class="header-title">Buku Besar Umum (General Ledger)</span>
+            <span class="header-badge">POSTED SAK</span>
+            <div class="header-nav">
+                <button type="button" class="btn-header-nav" onclick="navKe('jurnal')">Jurnal Harian</button>
+                <button type="button" class="btn-header-nav" onclick="navKe('posting')">Posting Jurnal</button>
+                <button type="button" class="btn-header-nav" onclick="navKe('mapping')">Mapping COA</button>
+                <button type="button" class="btn-header-nav" onclick="navKe('rekeningTahun')">Saldo Awal Tahun</button>
+            </div>
+        </div>
+        <div class="header-right">
+            <span id="userInfo" class="user-info">User: -</span>
+            <button type="button" class="btn-win-action" onclick="minimizeWindow()" title="Minimize">&#8211;</button>
+            <button type="button" class="btn-win-action" onclick="toggleMaximizeWindow()" title="Maximize">&#9633;</button>
+            <button type="button" class="btn-win-close" onclick="keluarAplikasi()" title="Keluar">&#10005;</button>
+        </div>
+    </div>
+
+    <!-- Tabs Bar -->
+    <div class="tabs">
+        <span id="tabA" class="tab on" onclick="switchTab('A')">A &nbsp;Ringkasan COA</span>
+        <span id="tabB" class="tab" onclick="switchTab('B')">B &nbsp;Detail Transaksi</span>
+    </div>
+
+    <!-- Filter Bar (Berlaku untuk kedua tab) -->
+    <div class="panel filter-panel">
+        <div class="fg">
+            <label>Periode:</label>
+            <input type="text" id="tgl1" style="width:95px;" placeholder="yyyy-mm-dd" maxlength="10"> s/d
+            <input type="text" id="tgl2" style="width:95px;" placeholder="yyyy-mm-dd" maxlength="10">
+        </div>
+        <div class="fg">
+            <label id="lblKeyword">Cari COA:</label>
+            <input type="text" id="keyword" style="width:170px;" placeholder="Kode / Nama Akun" onkeydown="if(event.keyCode===13) tampilkan();">
+        </div>
+        <div class="fg">
+            <button type="button" class="btn-primary" onclick="tampilkan()">TAMPILKAN</button>
+        </div>
+        <div class="fg">
+            <button type="button" class="btn-excel" onclick="exportDataExcel()">Export Excel</button>
+        </div>
+        <div class="fg" style="margin-left: 10px;">
+            <button type="button" class="btn-kembali" onclick="bukaDialogPilihAkun()">Cari Rekening...</button>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- TAB A — RINGKASAN SELURUH COA                               -->
+    <!-- ============================================================ -->
+    <div id="paneA" style="display: flex; flex-direction: column; flex: 1; min-height: 0;">
+        <!-- KPI Cards Tab A -->
+        <div class="kpi-row">
+            <div class="kpi-card total-coa">
+                <span class="kpi-label">Total COA</span>
+                <span class="kpi-value" id="kpiTotalCoa">0 Akun</span>
+            </div>
+            <div class="kpi-card saldo-awal">
+                <span class="kpi-label">Grand Total Saldo Awal</span>
+                <span class="kpi-value" id="kpiGrandSaldoAwal">Rp 0</span>
+            </div>
+            <div class="kpi-card debet">
+                <span class="kpi-label">Grand Total Debet</span>
+                <span class="kpi-value" id="kpiGrandDebet" style="color:#0284c7;">Rp 0</span>
+            </div>
+            <div class="kpi-card kredit">
+                <span class="kpi-label">Grand Total Kredit</span>
+                <span class="kpi-value" id="kpiGrandKredit" style="color:#d97706;">Rp 0</span>
+            </div>
+            <div class="kpi-card saldo-akhir">
+                <span class="kpi-label">Grand Total Saldo Akhir</span>
+                <span class="kpi-value" id="kpiGrandSaldoAkhir">Rp 0</span>
+            </div>
+        </div>
+
+        <!-- Tabel Ringkasan COA -->
+        <div class="wrap" id="wrapA">
+            <table id="tblRingkasanCOA">
+                <thead>
+                    <tr>
+                        <th class="ctr" style="width:45px;">No</th>
+                        <th style="width:110px;">Kode Rekening</th>
+                        <th style="width:330px;">Nama Rekening</th>
+                        <th class="num" style="width:145px;">Saldo Awal (Rp)</th>
+                        <th class="num" style="width:140px;">Total Debet (Rp)</th>
+                        <th class="num" style="width:140px;">Total Kredit (Rp)</th>
+                        <th class="num" style="width:150px;">Saldo Akhir (Rp)</th>
+                        <th class="ctr" style="width:85px;">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="tbodyRingkasanCOA">
+                    <tr><td colspan="8" class="msg-empty">Memuat data ringkasan COA...</td></tr>
+                </tbody>
+                <tfoot id="tfootRingkasanCOA" style="display:none;">
+                    <tr class="tot">
+                        <td colspan="3" style="text-align:right;">TOTAL SELURUH COA</td>
+                        <td class="num" id="totSaldoAwalA">Rp 0</td>
+                        <td class="num" id="totDebetA" style="color:#0284c7;">Rp 0</td>
+                        <td class="num" id="totKreditA" style="color:#d97706;">Rp 0</td>
+                        <td class="num" id="totSaldoAkhirA" style="color:#166534;">Rp 0</td>
+                        <td class="ctr">-</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- TAB B — DETAIL TRANSAKSI REKENING                           -->
+    <!-- ============================================================ -->
+    <div id="paneB" style="display: none; flex-direction: column; flex: 1; min-height: 0;">
+        <!-- Banner Info Akun Terpilih -->
+        <div class="banner-akun-b">
+            <div class="info-akun">
+                <button type="button" class="btn-kembali" onclick="switchTab('A')" style="font-weight:700;">&larr; Kembali ke Ringkasan COA</button>
+                <span class="badge-rek" id="lblBDetailKdRek">-</span>
+                <span style="font-size:13px; font-weight:700; color:#1f2937;" id="lblBDetailNmRek">Pilih rekening dari Tab A</span>
+                <span id="lblBDetailNormal" class="badge-normal-d">DEBET</span>
+            </div>
+            <div style="font-size:11px; color:#475569;">
+                Status Jurnal: <b style="color:#166534;">POSTED</b> | Periode: <b id="lblBPeriode">-</b>
+            </div>
+        </div>
+
+        <!-- KPI Cards Tab B -->
+        <div class="kpi-row">
+            <div class="kpi-card saldo-awal">
+                <span class="kpi-label">Saldo Awal Rekening</span>
+                <span class="kpi-value" id="kpiBSaldoAwal">Rp 0</span>
+            </div>
+            <div class="kpi-card debet">
+                <span class="kpi-label">Total Mutasi Debet</span>
+                <span class="kpi-value" id="kpiBDebet" style="color:#0284c7;">Rp 0</span>
+            </div>
+            <div class="kpi-card kredit">
+                <span class="kpi-label">Total Mutasi Kredit</span>
+                <span class="kpi-value" id="kpiBKredit" style="color:#d97706;">Rp 0</span>
+            </div>
+            <div class="kpi-card saldo-akhir">
+                <span class="kpi-label">Saldo Akhir Rekening</span>
+                <span class="kpi-value" id="kpiBSaldoAkhir">Rp 0</span>
+            </div>
+        </div>
+
+        <!-- Tabel Detail Transaksi Rekening -->
+        <div class="wrap" id="wrapB">
+            <table id="tblDetailBukuBesar">
+                <thead>
+                    <tr>
+                        <th style="width:125px;">Tgl Transaksi</th>
+                        <th style="width:130px;">No Jurnal</th>
+                        <th style="width:140px;">No Bukti</th>
+                        <th style="width:310px;">Keterangan</th>
+                        <th style="width:95px;">Kode COA</th>
+                        <th style="width:200px;">Nama Rekening</th>
+                        <th class="num" style="width:130px;">Debet (Rp)</th>
+                        <th class="num" style="width:130px;">Kredit (Rp)</th>
+                        <th class="num" style="width:145px;">Saldo Berjalan (Rp)</th>
+                    </tr>
+                </thead>
+                <tbody id="tbodyDetailBukuBesar">
+                    <tr><td colspan="9" class="msg-empty">Silakan pilih rekening pada Tab Ringkasan COA untuk melihat detail transaksi.</td></tr>
+                </tbody>
+                <tfoot id="tfootDetailBukuBesar" style="display:none;">
+                    <tr class="tot">
+                        <td colspan="6" style="text-align:right;">TOTAL MUTASI PERIODE</td>
+                        <td class="num" id="totDebetB" style="color:#0284c7;">Rp 0</td>
+                        <td class="num" id="totKreditB" style="color:#d97706;">Rp 0</td>
+                        <td class="num" id="totSaldoAkhirB" style="color:#166534;">Rp 0</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="spinner"></div>
+        <div id="loadingText" style="font-weight:600; color:#334155; font-size:13px;">Memuat data...</div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <!-- Modal Error & Debug -->
+    <div id="errorModal" class="modal-overlay">
+        <div style="background:white; border-radius:8px; width:520px; max-width:90%; padding:18px; box-shadow:0 10px 25px rgba(0,0,0,0.3); border-top:4px solid #dc2626;">
+            <h3 id="modalErrorTitle" style="margin-top:0; color:#dc2626; font-size:15px;">Terjadi Kesalahan</h3>
+            <p style="font-size:12px; color:#475569; margin:8px 0;">Detail kesalahan sistem atau query database:</p>
+            <div id="modalErrorBody" style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:4px; padding:10px; font-family:monospace; font-size:12px; color:#991b1b; max-height:200px; overflow-y:auto; white-space:pre-wrap; word-break:break-all;"></div>
+            <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:14px;">
+                <button type="button" onclick="salinError()" style="background:#2563eb; color:white;">Salin Pesan</button>
+                <button type="button" onclick="closeErrorModal()" style="background:#64748b; color:white;">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- LOGIKA JAVASCRIPT                                            -->
+    <!-- ============================================================ -->
+    <script>
+        // State variables
+        var activeTab = 'A';
+        var searchStarted = false;
+        var isLoading = false;
+        var ringkasanCOAData = null;
+        var detailBukuBesarData = null;
+        var selectedKdRek = '';
+        var selectedNmRek = '';
+        var lastLoadedPeriodA = '';
+
+        function $(id) { return document.getElementById(id); }
+
+        function esc(s) {
+            if (s === null || s === undefined) return '';
+            return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
+        function formatRupiah(num) {
+            var n = Math.round((parseFloat(num) || 0) * 100) / 100;
+            var neg = n < 0;
+            if (neg) n = -n;
+            var p = String(n.toFixed(2)).split('.');
+            var ip = p[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+            var dec = (p[1] === '00') ? '' : (',' + p[1]);
+            return (neg ? '-' : '') + ip + dec;
+        }
+
+        function todayStr() {
+            var d = new Date(), m = '' + (d.getMonth() + 1), dd = '' + d.getDate();
+            if (m.length < 2) m = '0' + m;
+            if (dd.length < 2) dd = '0' + dd;
+            return d.getFullYear() + '-' + m + '-' + dd;
+        }
+
+        function showLoading(msg) {
+            var el = $('loadingOverlay');
+            if (el) {
+                $('loadingText').textContent = msg || 'Memuat data...';
+                el.classList.add('active');
+            }
+        }
+
+        function hideLoading() {
+            var el = $('loadingOverlay');
+            if (el) el.classList.remove('active');
+        }
+
+        function showToast(msg, type) {
+            var t = $('toast');
+            if (!t) return;
+            t.textContent = msg;
+            t.className = 'toast show ' + (type || 'success');
+            setTimeout(function() { t.className = 'toast'; }, 3000);
+        }
+
+        function showAppError(title, msg) {
+            hideLoading();
+            isLoading = false;
+            var modal = $('errorModal');
+            $('modalErrorTitle').textContent = title || 'Terjadi Kesalahan';
+            $('modalErrorBody').textContent = msg || 'Tidak ada detail kesalahan.';
+            if (modal) modal.classList.add('active');
+            showToast(title || 'Error', 'error');
+        }
+
+        function closeErrorModal() {
+            var modal = $('errorModal');
+            if (modal) modal.classList.remove('active');
+        }
+
+        function salinError() {
+            var bodyEl = $('modalErrorBody');
+            if (bodyEl && bodyEl.textContent) {
+                navigator.clipboard.writeText(bodyEl.textContent);
+                showToast('Pesan error disalin ke clipboard!', 'success');
+            }
+        }
+
+        /* ---- Dynamic Height Fit ---- */
+        function fit() {
+            var wrap = (activeTab === 'A') ? $('wrapA') : $('wrapB');
+            if (!wrap) return;
+            var top = wrap.getBoundingClientRect().top;
+            var avail = window.innerHeight - top - 12;
+            if (avail < 120) avail = 120;
+            wrap.style.height = avail + 'px';
+        }
+        window.onresize = fit;
+
+        /* ---- Tab Switching ---- */
+        function switchTab(tab) {
+            activeTab = tab;
+            if (tab === 'A') {
+                $('tabA').className = 'tab on';
+                $('tabB').className = 'tab';
+                $('paneA').style.display = 'flex';
+                $('paneB').style.display = 'none';
+                $('lblKeyword').textContent = 'Cari COA:';
+                $('keyword').placeholder = 'Kode / Nama Akun';
+            } else {
+                $('tabA').className = 'tab';
+                $('tabB').className = 'tab on';
+                $('paneA').style.display = 'none';
+                $('paneB').style.display = 'flex';
+                $('lblKeyword').textContent = 'Cari Transaksi:';
+                $('keyword').placeholder = 'No Jurnal / Bukti / Ket';
+            }
+            fit();
+        }
+
+        /* ---- TAMPILKAN / FILTER ---- */
+        function tampilkan() {
+            var t1 = $('tgl1').value.trim();
+            var t2 = $('tgl2').value.trim();
+            if (!t1 || !t2) {
+                alert('Tentukan tanggal awal dan akhir periode!');
+                return;
+            }
+
+            if (activeTab === 'A') {
+                muatRingkasanCOA();
+            } else {
+                if (!selectedKdRek) {
+                    alert('Pilih salah satu rekening terlebih dahulu dari Tab Ringkasan COA.');
+                    switchTab('A');
+                    return;
+                }
+                muatDetailBukuBesar(selectedKdRek);
+            }
+        }
+
+        /* ---- TAB A: MUAT RINGKASAN COA ---- */
+        function muatRingkasanCOA() {
+            if (isLoading) return;
+            var t1 = $('tgl1').value.trim() || todayStr();
+            var t2 = $('tgl2').value.trim() || t1;
+            var kw = $('keyword').value.trim();
+
+            isLoading = true;
+            showLoading('Memuat Ringkasan COA Buku Besar...');
+
+            setTimeout(function() {
+                if (window.javaApp && typeof window.javaApp.loadRingkasanCOA === 'function') {
+                    try {
+                        window.javaApp.loadRingkasanCOA(t1, t2, kw);
+                    } catch (e) {
+                        showAppError('Kesalahan Panggilan JavaBridge', e.message);
+                    }
+                } else {
+                    // Demo fallback bila di luar runtime Java
+                    demoRingkasanCOA();
+                }
+            }, 50);
+        }
+
+        /* ---- Callback Java -> JS untuk Tab A ---- */
+        function terimaRingkasanCOA() {
+            try {
+                if (!window.javaApp) {
+                    hideLoading();
+                    isLoading = false;
+                    return;
+                }
+                var count = window.javaApp.getRingkasanCOACount();
+                var raw = '';
+                for (var i = 0; i < count; i++) {
+                    raw += window.javaApp.getRingkasanCOAChunk(i);
+                }
+                if (!raw) {
+                    hideLoading();
+                    isLoading = false;
+                    return;
+                }
+
+                var res = JSON.parse(raw);
+                ringkasanCOAData = res;
+                hideLoading();
+                isLoading = false;
+
+                if (!res.sukses) {
+                    showAppError('Gagal Query Database Ringkasan COA', res.pesan || 'Kesalahan query');
+                    return;
+                }
+
+                renderRingkasanCOA(res);
+                lastLoadedPeriodA = $('tgl1').value + '_' + $('tgl2').value;
+
+            } catch (e) {
+                showAppError('Gagal Memproses Data Ringkasan COA', e.message);
+            }
+        }
+        window.terimaRingkasanCOA = terimaRingkasanCOA;
+
+        function renderRingkasanCOA(res) {
+            var items = res.ringkasan || [];
+            $('kpiTotalCoa').textContent = (items.length || 0) + ' Akun';
+            $('kpiGrandSaldoAwal').textContent = 'Rp ' + formatRupiah(res.grand_saldo_awal);
+            $('kpiGrandDebet').textContent = 'Rp ' + formatRupiah(res.grand_total_debet);
+            $('kpiGrandKredit').textContent = 'Rp ' + formatRupiah(res.grand_total_kredit);
+            $('kpiGrandSaldoAkhir').textContent = 'Rp ' + formatRupiah(res.grand_saldo_akhir);
+
+            var tbody = $('tbodyRingkasanCOA');
+            var tfoot = $('tfootRingkasanCOA');
+
+            if (items.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" class="msg-empty">Tidak ada rekening COA yang sesuai dengan kriteria pencarian.</td></tr>';
+                if (tfoot) tfoot.style.display = 'none';
+                return;
+            }
+
+            var html = '';
+            for (var i = 0; i < items.length; i++) {
+                var r = items[i];
+                var sa = r.saldo_awal || 0;
+                var d = r.total_debet || 0;
+                var k = r.total_kredit || 0;
+                var sk = r.saldo_akhir || 0;
+
+                var safeKd = esc(r.kd_rek);
+                var safeNm = esc(r.nm_rek);
+                var argKd = String(r.kd_rek).replace(/'/g, "\\'");
+                var argNm = String(r.nm_rek).replace(/'/g, "\\'");
+
+                html += '<tr>' +
+                    '<td class="ctr">' + (r.no || (i + 1)) + '</td>' +
+                    '<td><span style="font-weight:700; color:#1e40af;">' + safeKd + '</span></td>' +
+                    '<td>' + safeNm + '</td>' +
+                    '<td class="num" style="color:#475569;">' + (sa !== 0 ? ('Rp ' + formatRupiah(sa)) : '0') + '</td>' +
+                    '<td class="num" style="font-weight:600; color:#0284c7;">' + (d > 0 ? ('Rp ' + formatRupiah(d)) : '0') + '</td>' +
+                    '<td class="num" style="font-weight:600; color:#d97706;">' + (k > 0 ? ('Rp ' + formatRupiah(k)) : '0') + '</td>' +
+                    '<td class="num" style="font-weight:700; color:#166534;">Rp ' + formatRupiah(sk) + '</td>' +
+                    '<td class="ctr">' +
+                        '<button type="button" class="btn-det" onclick="pilihDetailCOA(\'' + argKd + '\', \'' + argNm + '\')">Detail</button>' +
+                    '</td>' +
+                '</tr>';
+            }
+
+            tbody.innerHTML = html;
+
+            if (tfoot) {
+                tfoot.style.display = '';
+                $('totSaldoAwalA').textContent = 'Rp ' + formatRupiah(res.grand_saldo_awal);
+                $('totDebetA').textContent = 'Rp ' + formatRupiah(res.grand_total_debet);
+                $('totKreditA').textContent = 'Rp ' + formatRupiah(res.grand_total_kredit);
+                $('totSaldoAkhirA').textContent = 'Rp ' + formatRupiah(res.grand_saldo_akhir);
+            }
+
+            initResizable('wrapA');
+        }
+
+        /* ---- ACTION BUTTON DETAIL (TAB A -> TAB B) ---- */
+        function pilihDetailCOA(kdRek, nmRek) {
+            selectedKdRek = kdRek;
+            selectedNmRek = nmRek;
+
+            $('lblBDetailKdRek').textContent = kdRek;
+            $('lblBDetailNmRek').textContent = nmRek;
+
+            switchTab('B');
+            muatDetailBukuBesar(kdRek);
+        }
+
+        /* ---- TAB B: MUAT DETAIL BUKU BESAR ---- */
+        function muatDetailBukuBesar(kdRek) {
+            if (!kdRek) {
+                alert('Pilih rekening terlebih dahulu!');
+                return;
+            }
+            if (isLoading) return;
+
+            var t1 = $('tgl1').value.trim() || todayStr();
+            var t2 = $('tgl2').value.trim() || t1;
+            var kw = $('keyword').value.trim();
+
+            $('lblBPeriode').textContent = t1 + ' s/d ' + t2;
+
+            isLoading = true;
+            showLoading('Memuat transaksi COA ' + kdRek + '...');
+
+            setTimeout(function() {
+                if (window.javaApp && typeof window.javaApp.loadDetailBukuBesar === 'function') {
+                    try {
+                        window.javaApp.loadDetailBukuBesar(kdRek, t1, t2, kw);
+                    } catch (e) {
+                        showAppError('Kesalahan Panggilan JavaBridge Detail', e.message);
+                    }
+                } else if (window.javaApp && typeof window.javaApp.loadBukuBesar === 'function') {
+                    try {
+                        window.javaApp.loadBukuBesar(kdRek, t1, t2, kw);
+                    } catch (e) {
+                        showAppError('Kesalahan Panggilan JavaBridge Detail', e.message);
+                    }
+                } else {
+                    demoDetailBukuBesar(kdRek);
+                }
+            }, 50);
+        }
+
+        /* ---- Callback Java -> JS untuk Tab B ---- */
+        function terimaDetailBukuBesar() {
+            try {
+                if (!window.javaApp) {
+                    hideLoading();
+                    isLoading = false;
+                    return;
+                }
+                var count = window.javaApp.getBukuBesarDataCount();
+                var raw = '';
+                for (var i = 0; i < count; i++) {
+                    raw += window.javaApp.getBukuBesarDataChunk(i);
+                }
+                if (!raw) {
+                    hideLoading();
+                    isLoading = false;
+                    return;
+                }
+
+                var res = JSON.parse(raw);
+                detailBukuBesarData = res;
+                hideLoading();
+                isLoading = false;
+
+                if (!res.sukses) {
+                    showAppError('Gagal Memuat Detail Transaksi', res.pesan || 'Kesalahan query');
+                    return;
+                }
+
+                renderDetailBukuBesar(res);
+
+            } catch (e) {
+                showAppError('Gagal Memproses Data Detail Transaksi', e.message);
+            }
+        }
+        window.terimaDetailBukuBesar = terimaDetailBukuBesar;
+        window.terimaBukuBesar = terimaDetailBukuBesar; // alias
+
+        function renderDetailBukuBesar(res) {
+            $('lblBDetailKdRek').textContent = res.kd_rek || selectedKdRek;
+            $('lblBDetailNmRek').textContent = res.nm_rek || selectedNmRek;
+
+            var isKredit = (res.balance_type === 'K');
+            var lblNormal = $('lblBDetailNormal');
+            if (isKredit) {
+                lblNormal.textContent = 'KREDIT';
+                lblNormal.className = 'badge-normal-k';
+            } else {
+                lblNormal.textContent = 'DEBET';
+                lblNormal.className = 'badge-normal-d';
+            }
+
+            $('kpiBSaldoAwal').textContent = 'Rp ' + formatRupiah(res.saldo_awal);
+            $('kpiBDebet').textContent = 'Rp ' + formatRupiah(res.total_debet);
+            $('kpiBKredit').textContent = 'Rp ' + formatRupiah(res.total_kredit);
+            $('kpiBSaldoAkhir').textContent = 'Rp ' + formatRupiah(res.saldo_akhir);
+
+            var items = res.mutasi || [];
+            var tbody = $('tbodyDetailBukuBesar');
+            var tfoot = $('tfootDetailBukuBesar');
+
+            // Baris SALDO AWAL selalu tampil di paling atas (ada transaksi atau tidak)
+            var html = '<tr style="background:#f1f5f9; font-weight:700;">' +
+                '<td colspan="6" style="text-align:right; color:#334155;">SALDO AWAL PERIODE</td>' +
+                '<td class="num">-</td>' +
+                '<td class="num">-</td>' +
+                '<td class="num" style="font-weight:700; color:#166534;">Rp ' + formatRupiah(res.saldo_awal) + '</td>' +
+            '</tr>';
+
+            if (items.length === 0) {
+                html += '<tr><td colspan="9" class="msg-empty">Tidak ada mutasi jurnal berstatus POSTED pada periode tanggal yang dipilih.</td></tr>';
+                tbody.innerHTML = html;
+                if (tfoot) {
+                    tfoot.style.display = '';
+                    $('totDebetB').textContent = 'Rp 0';
+                    $('totKreditB').textContent = 'Rp 0';
+                    $('totSaldoAkhirB').textContent = 'Rp ' + formatRupiah(res.saldo_akhir);
+                }
+                return;
+            }
+
+            for (var i = 0; i < items.length; i++) {
+                var row = items[i];
+                var d = row.debet || 0;
+                var k = row.kredit || 0;
+                var sb = row.saldo_berjalan || 0;
+
+                html += '<tr>' +
+                    '<td>' + esc(row.tgl_transaksi) + '</td>' +
+                    '<td><span class="badge-no-jurnal">' + esc(row.no_jurnal) + '</span></td>' +
+                    '<td><b>' + esc(row.no_bukti) + '</b></td>' +
+                    '<td>' + esc(row.keterangan) + '</td>' +
+                    '<td><span style="font-weight:700; color:#1e40af;">' + esc(row.kd_rek) + '</span></td>' +
+                    '<td>' + esc(row.nm_rek) + '</td>' +
+                    '<td class="num" style="font-weight:600; color:#0284c7;">' + (d > 0 ? ('Rp ' + formatRupiah(d)) : '-') + '</td>' +
+                    '<td class="num" style="font-weight:600; color:#d97706;">' + (k > 0 ? ('Rp ' + formatRupiah(k)) : '-') + '</td>' +
+                    '<td class="num" style="font-weight:700; color:#166534;">Rp ' + formatRupiah(sb) + '</td>' +
+                '</tr>';
+            }
+
+            tbody.innerHTML = html;
+
+            if (tfoot) {
+                tfoot.style.display = '';
+                $('totDebetB').textContent = 'Rp ' + formatRupiah(res.total_debet);
+                $('totKreditB').textContent = 'Rp ' + formatRupiah(res.total_kredit);
+                $('totSaldoAkhirB').textContent = 'Rp ' + formatRupiah(res.saldo_akhir);
+            }
+
+            initResizable('wrapB');
+        }
+
+        /* ---- DIALOG PILIH REKENING DARI JAVA ---- */
+        function bukaDialogPilihAkun() {
+            if (window.javaApp && typeof window.javaApp.bukaCariRekening === 'function') {
+                window.javaApp.bukaCariRekening();
+            } else {
+                alert('Fitur cari rekening dialog dibuka.');
+            }
+        }
+
+        // Dipanggil dari listener Java saat user memilih akun dari DlgCariRekening
+        function setAkunDariDialog(kd, nm) {
+            pilihDetailCOA(kd, nm);
+        }
+        window.setAkunDariDialog = setAkunDariDialog;
+
+        /* ---- EXPORT EXCEL ---- */
+        function exportDataExcel() {
+            var t1 = $('tgl1').value.trim() || todayStr();
+            var t2 = $('tgl2').value.trim() || t1;
+
+            if (activeTab === 'A') {
+                if (!ringkasanCOAData || !ringkasanCOAData.ringkasan || ringkasanCOAData.ringkasan.length === 0) {
+                    alert('Tidak ada data Ringkasan COA untuk diexport.');
+                    return;
+                }
+                var csv = '\uFEFF';
+                csv += '"LAPORAN BUKU BESAR - RINGKASAN COA"\n';
+                csv += '"Periode: ' + t1 + ' s/d ' + t2 + '"\n\n';
+                csv += '"No","Kode Rekening","Nama Rekening","Saldo Awal","Total Debet","Total Kredit","Saldo Akhir"\n';
+
+                var arr = ringkasanCOAData.ringkasan;
+                for (var i = 0; i < arr.length; i++) {
+                    var r = arr[i];
+                    csv += '"' + (r.no || (i + 1)) + '","' + (r.kd_rek || '') + '","' + (r.nm_rek || '').replace(/"/g, '""') + '","' + (r.saldo_awal || 0) + '","' + (r.total_debet || 0) + '","' + (r.total_kredit || 0) + '","' + (r.saldo_akhir || 0) + '"\n';
+                }
+                csv += '"","TOTAL","","' + (ringkasanCOAData.grand_saldo_awal || 0) + '","' + (ringkasanCOAData.grand_total_debet || 0) + '","' + (ringkasanCOAData.grand_total_kredit || 0) + '","' + (ringkasanCOAData.grand_saldo_akhir || 0) + '"\n';
+
+                if (window.javaApp && typeof window.javaApp.simpanFileExcel === 'function') {
+                    window.javaApp.simpanFileExcel(csv, 'BukuBesar_Ringkasan_COA_' + t1 + '_' + t2 + '.csv');
+                } else {
+                    downloadCsvBrowser(csv, 'BukuBesar_Ringkasan_COA_' + t1 + '_' + t2 + '.csv');
+                }
+            } else {
+                if (!detailBukuBesarData || !detailBukuBesarData.mutasi || detailBukuBesarData.mutasi.length === 0) {
+                    alert('Tidak ada data Detail Transaksi untuk diexport.');
+                    return;
+                }
+                var csvB = '\uFEFF';
+                csvB += '"LAPORAN BUKU BESAR - DETAIL TRANSAKSI"\n';
+                csvB += '"Rekening: ' + selectedKdRek + ' - ' + selectedNmRek + '"\n';
+                csvB += '"Periode: ' + t1 + ' s/d ' + t2 + '"\n';
+                csvB += '"Saldo Awal: ' + (detailBukuBesarData.saldo_awal || 0) + '"\n\n';
+                csvB += '"Tgl Transaksi","No Jurnal","No Bukti","Keterangan","Kode COA","Nama Rekening","Debet","Kredit","Saldo Berjalan"\n';
+
+                var arrB = detailBukuBesarData.mutasi;
+                for (var j = 0; j < arrB.length; j++) {
+                    var m = arrB[j];
+                    csvB += '"' + (m.tgl_transaksi || '') + '","' + (m.no_jurnal || '') + '","' + (m.no_bukti || '') + '","' + (m.keterangan || '').replace(/"/g, '""') + '","' + (m.kd_rek || '') + '","' + (m.nm_rek || '').replace(/"/g, '""') + '","' + (m.debet || 0) + '","' + (m.kredit || 0) + '","' + (m.saldo_berjalan || 0) + '"\n';
+                }
+                csvB += '"","","","TOTAL MUTASI","","","' + (detailBukuBesarData.total_debet || 0) + '","' + (detailBukuBesarData.total_kredit || 0) + '","' + (detailBukuBesarData.saldo_akhir || 0) + '"\n';
+
+                if (window.javaApp && typeof window.javaApp.simpanFileExcel === 'function') {
+                    window.javaApp.simpanFileExcel(csvB, 'BukuBesar_Detail_' + selectedKdRek + '_' + t1 + '_' + t2 + '.csv');
+                } else {
+                    downloadCsvBrowser(csvB, 'BukuBesar_Detail_' + selectedKdRek + '_' + t1 + '_' + t2 + '.csv');
+                }
+            }
+        }
+
+        function downloadCsvBrowser(csv, filename) {
+            var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            var link = document.createElement("a");
+            var url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", filename);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        /* ---- WINDOW & NAVIGATION ACTIONS ---- */
+        function navKe(tujuan) {
+            if (!window.javaApp) {
+                alert('Membuka menu ' + tujuan);
+                return;
+            }
+            if (tujuan === 'jurnal' && window.javaApp.bukaJurnalTransaksi) window.javaApp.bukaJurnalTransaksi();
+            else if (tujuan === 'posting' && window.javaApp.bukaPostingJurnal) window.javaApp.bukaPostingJurnal();
+            else if (tujuan === 'mapping' && window.javaApp.bukaMappingCOA) window.javaApp.bukaMappingCOA();
+            else if (tujuan === 'rekeningTahun' && window.javaApp.bukaRekeningTahunan) window.javaApp.bukaRekeningTahunan();
+        }
+
+        function keluarAplikasi() {
+            if (window.javaApp && window.javaApp.tutup) {
+                window.javaApp.tutup();
+            } else if (window.javaApp && window.javaApp.keluarForm) {
+                window.javaApp.keluarForm();
+            } else {
+                window.close();
+            }
+        }
+
+        function toggleMaximizeWindow() {
+            if (window.javaApp && window.javaApp.toggleMaximize) window.javaApp.toggleMaximize();
+        }
+
+        function minimizeWindow() {
+            if (window.javaApp && window.javaApp.minimize) window.javaApp.minimize();
+        }
+
+        /* ---- Column Resizing ---- */
+        function initResizable(wrapId) {
+            var wrap = $(wrapId);
+            if (!wrap) return;
+            var tbl = wrap.getElementsByTagName('table')[0];
+            if (!tbl) return;
+            var ths = tbl.getElementsByTagName('th');
+            for (var i = 0; i < ths.length; i++) {
+                if (ths[i].querySelector('.resizer')) continue;
+                (function(th) {
+                    var r = document.createElement('div');
+                    r.className = 'resizer';
+                    th.appendChild(r);
+                    r.onmousedown = function(e) {
+                        var x0 = e.clientX, w0 = th.offsetWidth;
+                        document.onmousemove = function(ev) {
+                            var nw = w0 + ev.clientX - x0;
+                            if (nw > 30) th.style.width = nw + 'px';
+                        };
+                        document.onmouseup = function() {
+                            document.onmousemove = null;
+                            document.onmouseup = null;
+                        };
+                        e.stopPropagation();
+                        e.preventDefault();
+                    };
+                })(ths[i]);
+            }
+        }
+
+        /* ---- DEMO FALLBACK (Bila tanpa Java Runtime) ---- */
+        function demoRingkasanCOA() {
+            hideLoading();
+            isLoading = false;
+            var demo = {
+                sukses: true,
+                grand_saldo_awal: 250000000,
+                grand_total_debet: 145000000,
+                grand_total_kredit: 135000000,
+                grand_saldo_akhir: 260000000,
+                ringkasan: [
+                    { no: 1, kd_rek: '11101', nm_rek: 'KAS BESAR', balance: 'D', tipe: 'N', saldo_awal: 80000000, total_debet: 45000000, total_kredit: 35000000, saldo_akhir: 90000000 },
+                    { no: 2, kd_rek: '11102', nm_rek: 'BANK BSI', balance: 'D', tipe: 'N', saldo_awal: 70000000, total_debet: 35000000, total_kredit: 25000000, saldo_akhir: 80000000 },
+                    { no: 3, kd_rek: '13201', nm_rek: 'PIUTANG PASIEN RAWAT JALAN', balance: 'D', tipe: 'N', saldo_awal: 50000000, total_debet: 25000000, total_kredit: 20000000, saldo_akhir: 55000000 },
+                    { no: 4, kd_rek: '411201', nm_rek: 'PENDAPATAN FARMASI RAWAT JALAN', balance: 'K', tipe: 'R', saldo_awal: 0, total_debet: 0, total_kredit: 25000000, saldo_akhir: 25000000 },
+                    { no: 5, kd_rek: '511201', nm_rek: 'HPP FARMASI RAWAT JALAN', balance: 'D', tipe: 'R', saldo_awal: 0, total_debet: 15000000, total_kredit: 0, saldo_akhir: 15000000 }
+                ]
+            };
+            renderRingkasanCOA(demo);
+        }
+
+        function demoDetailBukuBesar(kd) {
+            hideLoading();
+            isLoading = false;
+            var demoB = {
+                sukses: true,
+                kd_rek: kd,
+                nm_rek: selectedNmRek || 'KAS BESAR',
+                balance_type: 'D',
+                saldo_awal: 80000000,
+                total_debet: 45000000,
+                total_kredit: 35000000,
+                saldo_akhir: 90000000,
+                mutasi: [
+                    { tgl_transaksi: '2026-10-01 08:30:00', no_jurnal: 'JR20261001000001', no_bukti: '2026/10/01/000001', keterangan: 'Pembayaran Kasir Pasien Tunai Ralan', kd_rek: kd, nm_rek: selectedNmRek, debet: 25000000, kredit: 0, saldo_berjalan: 105000000 },
+                    { tgl_transaksi: '2026-10-03 14:15:00', no_jurnal: 'JR20261003000005', no_bukti: 'BKK-2610-001', keterangan: 'Setoran Kas ke Bank BSI', kd_rek: kd, nm_rek: selectedNmRek, debet: 0, kredit: 35000000, saldo_berjalan: 70000000 },
+                    { tgl_transaksi: '2026-10-07 10:20:00', no_jurnal: 'JR20261007000792', no_bukti: '2026/10/03/000218', keterangan: 'Penerimaan Kas Rawat Inap', kd_rek: kd, nm_rek: selectedNmRek, debet: 20000000, kredit: 0, saldo_berjalan: 90000000 }
+                ]
+            };
+            renderDetailBukuBesar(demoB);
+        }
+
+        /* ---- INISIALISASI (Mengikuti Pola JurnalHarianWeb) ---- */
+        function init() {
+            try {
+                var t1 = $('tgl1');
+                var t2 = $('tgl2');
+
+                if (!t1.value || !t2.value) {
+                    var ds = '';
+                    try {
+                        if (window.javaApp && typeof window.javaApp.getTanggalHariIni === 'function') {
+                            ds = window.javaApp.getTanggalHariIni();
+                        }
+                    } catch (e0) {}
+                    if (!ds) ds = todayStr();
+                    if (!t1.value) t1.value = ds;
+                    if (!t2.value) t2.value = ds;
+                }
+
+                if (window.javaApp && typeof window.javaApp.getUserInfo === 'function') {
+                    try {
+                        var u = window.javaApp.getUserInfo();
+                        if (u) $('userInfo').textContent = 'User: ' + u;
+                    } catch (eu) {}
+                }
+
+                fit();
+
+                // Pemuatan data otomatis saat menu dibuka pertama kali
+                if (!searchStarted) {
+                    searchStarted = true;
+                    muatRingkasanCOA();
+                }
+
+                initResizable('wrapA');
+
+            } catch (e) {
+                showAppError('Kesalahan Inisialisasi Buku Besar', e.message);
+            }
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    </script>
+</body>
+</html>

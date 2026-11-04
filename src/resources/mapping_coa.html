@@ -1,0 +1,1518 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Katalog Pemetaan COA Terpadu</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f4f8;
+            padding: 12px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 24px);
+        }
+        .header {
+            background: #1e293b;
+            color: white;
+            padding: 14px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+            border-bottom: 1px solid #334155;
+        }
+        .header h1 { font-size: 18px; font-weight: 700; letter-spacing: 0.5px; }
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .header-right .user-info { font-size: 13px; opacity: 0.9; }
+        .btn-keluar-header {
+            background: #dc2626; border: none; color: white;
+            padding: 6px 18px; border-radius: 4px; font-weight: 600; font-size: 13px;
+            cursor: pointer; transition: 0.15s;
+        }
+        .btn-keluar-header:hover { background: #b91c1c; }
+
+        /* NAV TABS UTAMA */
+        .nav-tabs {
+            display: flex;
+            background: #f1f5f9;
+            border-bottom: 2px solid #cbd5e1;
+            padding: 0 20px;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+        .tab-btn {
+            padding: 12px 22px;
+            border: none;
+            background: transparent;
+            font-size: 13px;
+            font-weight: 700;
+            color: #64748b;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+        }
+        .tab-btn:hover { color: #0f172a; background: rgba(255,255,255,0.6); }
+        .tab-btn.active {
+            color: #0284c7;
+            background: white;
+            border-bottom: 3px solid #0284c7;
+            border-top-left-radius: 4px;
+            border-top-right-radius: 4px;
+        }
+
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 24px;
+            background: #f8fafc;
+        }
+
+        /* TAB PANE */
+        .tab-pane { display: none; }
+        .tab-pane.active { display: block; }
+
+        /* SECTION CARD */
+        .card-section {
+            background: white;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 18px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+            overflow: hidden;
+        }
+        .card-header {
+            background: #f8fafc;
+            padding: 10px 16px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .card-header h3 {
+            font-size: 14px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+        .card-header .badge-tag {
+            font-size: 11px;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+            background: #e2e8f0;
+            color: #475569;
+        }
+        .card-body { padding: 14px 16px; }
+
+        /* TABLE MAPPING */
+        table.mapping-tbl {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        table.mapping-tbl th {
+            background: #f1f5f9;
+            padding: 9px 12px;
+            text-align: left;
+            border-bottom: 2px solid #cbd5e1;
+            color: #334155;
+            font-weight: 700;
+        }
+        table.mapping-tbl td {
+            padding: 8px 12px;
+            border-bottom: 1px solid #f1f5f9;
+            vertical-align: middle;
+        }
+        table.mapping-tbl tr:hover { background: #fafafa; }
+
+        .posisi-badge {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+        .posisi-badge.kredit { background: #fee2e2; color: #991b1b; }
+        .posisi-badge.debet { background: #dbeafe; color: #1e40af; }
+
+        .coa-box {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .coa-box input {
+            width: 115px;
+            padding: 6px 8px;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #0f172a;
+        }
+        .coa-box input:focus { outline: none; border-color: #0284c7; }
+        .coa-nama-text {
+            font-size: 12px;
+            color: #334155;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            padding: 6px 10px;
+            border-radius: 4px;
+            flex: 1;
+            min-height: 31px;
+            display: flex;
+            align-items: center;
+        }
+        .btn-cari-coa {
+            background: #475569; color: white; border: none;
+            padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 600;
+        }
+        .btn-cari-coa:hover { background: #334155; }
+
+        .btn-simpan-row {
+            background: #059669; color: white; border: none;
+            padding: 6px 16px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 600;
+            transition: 0.15s;
+        }
+        .btn-simpan-row:hover { background: #047857; }
+        .btn-hapus-row {
+            background: #dc2626; color: white; border: none;
+            padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 600;
+            transition: 0.15s;
+        }
+        .btn-hapus-row:hover { background: #b91c1c; }
+
+        /* INFO BANNER */
+        .info-box {
+            background: #f0f9ff;
+            border-left: 4px solid #0284c7;
+            padding: 10px 14px;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #0369a1;
+            margin-bottom: 14px;
+            line-height: 1.4;
+        }
+
+        /* TAB B TOOLBAR */
+        .poli-toolbar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: white;
+            padding: 12px 16px;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 16px;
+        }
+        .poli-toolbar select {
+            padding: 7px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #0f172a;
+            min-width: 250px;
+        }
+
+        /* TAB C — AP LOGISTIK */
+        .sub-tab-bar {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 14px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 0;
+        }
+        .sub-tab-btn {
+            padding: 8px 18px;
+            border: none;
+            background: transparent;
+            font-size: 13px;
+            font-weight: 700;
+            color: #64748b;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.15s;
+        }
+        .sub-tab-btn.active {
+            color: #7c3aed;
+            border-bottom: 3px solid #7c3aed;
+        }
+        .sub-tab-btn:hover { color: #0f172a; background: #f1f5f9; }
+        .sub-tab-pane { display: none; }
+        .sub-tab-pane.active { display: block; }
+
+        /* Badge warna untuk Tab C */
+        .badge-purple { background: #f3e8ff; color: #6b21a8; }
+        .badge-teal   { background: #ccfbf1; color: #0f766e; }
+
+        /* Info AR section (hijau) */
+        .info-box-green {
+            background: #f0fdf4;
+            border-left: 4px solid #16a34a;
+            padding: 10px 14px;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #15803d;
+            margin-bottom: 14px;
+            line-height: 1.4;
+        }
+        /* Warna card-header Tab C */
+        .card-header-purple { background: #faf5ff; }
+        .card-header-teal   { background: #f0fdfa; }
+
+        .toast {
+            position: fixed; bottom: 24px; right: 24px;
+            background: #1e293b; color: white;
+            padding: 12px 20px; border-radius: 6px; font-size: 13px; font-weight: 600;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transform: translateY(100px); opacity: 0;
+            transition: all 0.3s; z-index: 10001;
+        }
+        .toast.show { transform: translateY(0); opacity: 1; }
+        .toast.success { background: #059669; }
+        .toast.error { background: #dc2626; }
+
+        .window-controls {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-win-action {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s;
+        }
+        .btn-win-action:hover { background: rgba(255, 255, 255, 0.3); }
+        .btn-win-action:active { transform: scale(0.92); }
+
+        ::-webkit-scrollbar { width: 7px; height: 7px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- HEADER -->
+    <div class="header">
+        <h1>Katalog Pemetaan COA Terpadu</h1>
+        <div class="header-right">
+            <span class="user-info" id="userInfo">User: -</span>
+            <div class="window-controls">
+                <button class="btn-win-action" title="Minimalkan Jendela"
+                    onclick="if(window.javaApp && window.javaApp.minimize) window.javaApp.minimize();">─</button>
+                <button class="btn-win-action" title="Maksimalkan / Pulihkan Ukuran"
+                    onclick="if(window.javaApp && window.javaApp.toggleMaximize) window.javaApp.toggleMaximize();">&#x26F6;</button>
+                <button class="btn-keluar-header" onclick="keluar()">Keluar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- NAV TABS -->
+    <div class="nav-tabs">
+        <button class="tab-btn active" id="tabBtnGlobal" onclick="switchTab('global')">
+            Tab A: Template Global &amp; AR
+        </button>
+        <button class="tab-btn" id="tabBtnPoli" onclick="switchTab('poli')" style="display:none;">
+            Tab B: Per Poli / Unit (Cost Center)
+        </button>
+        <!-- Tab C disembunyikan sementara, akan diaktifkan kembali saat modul AP & JM Dokter siap -->
+        <button class="tab-btn" id="tabBtnAP" onclick="switchTab('ap')" style="display:none;">
+            Tab C: AP Logistik &amp; Hutang JM Dokter
+        </button>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+        
+        <!-- TAB A: TEMPLATE GLOBAL -->
+        <div id="tabGlobal" class="tab-pane active">
+            <div class="info-box">
+                <b>Informasi Tab A (Global Template)</b>: Mapping ini menjadi dasar otomatis untuk seluruh transaksi di SIMRS Khanza (5 Master Tarif: Rawat Jalan, Rawat Inap, Laboratorium, Radiologi, Operasi). Termasuk Akun Piutang per Penjamin (DEBET), Potongan, Obat, dan Akun Bayar Kasir (Cash, Bank, QRIS).
+            </div>
+
+            <!-- 1. RAWAT JALAN -->
+            <div class="card-section">
+                <div class="card-header">
+                    <h3>1. Master Rawat Jalan (jns_perawatan)</h3>
+                    <span class="badge-tag">6 Komponen Kolom Tarif</span>
+                </div>
+                <div class="card-body">
+                    <table class="mapping-tbl" id="tblRalan">
+                        <thead>
+                            <tr>
+                                <th style="width:220px;">Komponen Master</th>
+                                <th style="width:100px;">Posisi</th>
+                                <th>Rekening COA (Kode & Nama Akun)</th>
+                                <th style="width:110px;">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 2. RAWAT INAP -->
+            <div class="card-section">
+                <div class="card-header">
+                    <h3>2. Master Rawat Inap (jns_perawatan_inap)</h3>
+                    <span class="badge-tag">6 Komponen Kolom Tarif</span>
+                </div>
+                <div class="card-body">
+                    <table class="mapping-tbl" id="tblRanap">
+                        <thead>
+                            <tr>
+                                <th style="width:220px;">Komponen Master</th>
+                                <th style="width:100px;">Posisi</th>
+                                <th>Rekening COA (Kode & Nama Akun)</th>
+                                <th style="width:110px;">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 3. LABORATORIUM -->
+            <div class="card-section">
+                <div class="card-header">
+                    <h3>3. Master Laboratorium (jns_perawatan_lab)</h3>
+                    <span class="badge-tag">7 Komponen Kolom Tarif</span>
+                </div>
+                <div class="card-body">
+                    <table class="mapping-tbl" id="tblLab">
+                        <thead>
+                            <tr>
+                                <th style="width:220px;">Komponen Master</th>
+                                <th style="width:100px;">Posisi</th>
+                                <th>Rekening COA (Kode & Nama Akun)</th>
+                                <th style="width:110px;">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 4. RADIOLOGI -->
+            <div class="card-section">
+                <div class="card-header">
+                    <h3>4. Master Radiologi (jns_perawatan_radiologi)</h3>
+                    <span class="badge-tag">7 Komponen Kolom Tarif</span>
+                </div>
+                <div class="card-body">
+                    <table class="mapping-tbl" id="tblRad">
+                        <thead>
+                            <tr>
+                                <th style="width:220px;">Komponen Master</th>
+                                <th style="width:100px;">Posisi</th>
+                                <th>Rekening COA (Kode & Nama Akun)</th>
+                                <th style="width:110px;">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 5. OPERASI -->
+            <div class="card-section">
+                <div class="card-header">
+                    <h3>5. Master Paket Operasi (paket_operasi)</h3>
+                    <span class="badge-tag">Kelompok Pos Operasi / IBS</span>
+                </div>
+                <div class="card-body">
+                    <table class="mapping-tbl" id="tblOperasi">
+                        <thead>
+                            <tr>
+                                <th style="width:240px;">Komponen Master</th>
+                                <th style="width:100px;">Posisi</th>
+                                <th>Rekening COA (Kode & Nama Akun)</th>
+                                <th style="width:110px;">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 6. AKUN PIUTANG PER PENJAMIN (SISI DEBET TAGIHAN) — Baca dari tabel akun_piutang -->
+            <div class="card-section">
+                <div class="card-header">
+                    <h3>6. Akun Piutang per Penjamin (Sisi Debet Tagihan)</h3>
+                    <div style="display:flex; gap:8px; align-items:center;">
+                        <span class="badge-tag" style="background:#dcfce7;color:#15803d;">Master: Tabel akun_piutang</span>
+                        <span class="badge-tag">Posisi: DEBET</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="info-box-green">
+                        <b>Informasi:</b> Setiap penjamin / cara bayar yang bersifat piutang (BPJS, Asuransi, dll.) dipetakan ke <b>Akun Piutang (sisi Debet)</b> pada jurnal tagihan pasien.
+                        Data bersumber dari tabel <code>akun_piutang</code> — master data yang juga digunakan oleh modul DlgAkunPiutang. Klik <b>Simpan</b> untuk mengaitkan kode rekening COA ke setiap penjamin.
+                    </div>
+                    <table class="mapping-tbl" id="tblPayorAR">
+                        <thead>
+                            <tr>
+                                <th style="width:220px;">Kode &amp; Cara Bayar / Penjamin</th>
+                                <th style="width:100px;">Posisi</th>
+                                <th>Rekening Piutang COA (Akun AR / Debet)</th>
+                                <th style="width:110px;">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 7. LAIN-LAIN: POTONGAN, FARMASI & PPN -->
+            <div class="card-section">
+                <div class="card-header">
+                    <h3>7. Potongan Pelayanan, Farmasi/Obat & PPN Keluaran</h3>
+                    <span class="badge-tag">Komponen Pelengkap Jurnal</span>
+                </div>
+                <div class="card-body">
+                    <table class="mapping-tbl" id="tblLainnya">
+                        <thead>
+                            <tr>
+                                <th style="width:240px;">Komponen</th>
+                                <th style="width:100px;">Posisi</th>
+                                <th>Rekening COA (Kode & Nama Akun)</th>
+                                <th style="width:110px;">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div><!-- /card-section #7 -->
+
+            <!-- 8. AKUN BAYAR / METODE PEMBAYARAN KASIR -->
+            <div class="card-section">
+                <div class="card-header">
+                    <h3>8. Akun Bayar / Metode Pembayaran Kasir (Cash, Bank, QRIS, EDC, Piutang)</h3>
+                    <div style="display:flex; gap:8px; align-items:center;">
+                        <button type="button" class="btn-cari-coa" style="background:#0284c7;" onclick="tambahAkunBayarBaru()">+ Tambah Metode Bayar</button>
+                        <span class="badge-tag">Akun Penerimaan Kasir (Posisi Debet)</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <table class="mapping-tbl" id="tblAkunBayar">
+                        <thead>
+                            <tr>
+                                <th style="width:240px;">Nama Akun / Metode Bayar</th>
+                                <th style="width:100px;">Posisi</th>
+                                <th>Rekening COA (Kode &amp; Nama Akun)</th>
+                                <th style="width:140px;">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbodyAkunBayar"></tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- TAB B: PRIORITAS PER POLI -->
+        <div id="tabPoli" class="tab-pane">
+            <div class="info-box">
+                <b>Informasi Tab B (Per Poli / Unit)</b>: Gunakan tab ini jika pendapatan/jasa suatu poli (Poli Gigi, Hemodialisa, VK, dll.) ingin dipisahkan ke akun khusus. <b>Komponen yang dikosongkan otomatis mengikuti Tab A (Global).</b>
+                Tab ini menggantikan <code>MappingCOARajal</code> &amp; <code>MappingCOARanap</code> versi lama.
+            </div>
+
+            <div class="poli-toolbar">
+                <label style="font-weight:700; color:#334155;">Pilih Unit / Poliklinik :</label>
+                <select id="selectPoli" onchange="onPoliChanged()">
+                    <option value="">-- Pilih Poliklinik --</option>
+                </select>
+                <button class="btn-cari-coa" onclick="loadPoliData()">Muat Mapping Poli</button>
+            </div>
+
+            <div class="card-section" id="cardPoliDetail" style="display:none;">
+                <div class="card-header">
+                    <h3 id="lblPoliDipilih">Pemetaan Khusus Poli</h3>
+                    <span class="badge-tag">Override Komponen Ralan / Ranap</span>
+                </div>
+                <div class="card-body">
+                    <table class="mapping-tbl" id="tblPoliOverride">
+                        <thead>
+                            <tr>
+                                <th style="width:240px;">Komponen Tarif</th>
+                                <th style="width:100px;">Posisi</th>
+                                <th>Rekening Khusus Poli Ini</th>
+                                <th style="width:180px;">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB C: AP LOGISTIK & HUTANG JM DOKTER (disembunyikan, aktifkan kembali saat modul siap) -->
+        <div id="tabAP" class="tab-pane" style="display:none;">
+            <div class="info-box" style="background:#faf5ff; border-left-color:#7c3aed; color:#5b21b6;">
+                <b>Informasi Tab C (AP Logistik &amp; Hutang JM Dokter)</b>: Mapping ini menentukan akun <b>Beban (Debet)</b> dan <b>Hutang (Kredit)</b> yang digunakan saat modul logistik (Farmasi, IPSRS, Dapur, Inventaris)
+                menyimpan penerimaan barang, dan saat sistem mencatat jasa medis dokter. Jurnal akan tersimpan dalam status <code>Draft</code> dan perlu divalidasi oleh Finance.
+            </div>
+
+            <!-- Sub Tab Bar -->
+            <div class="sub-tab-bar">
+                <button class="sub-tab-btn active" id="subBtnLogistik" onclick="switchSubTab('logistik')">[ Logistik ] AP / Hutang Supplier</button>
+                <button class="sub-tab-btn" id="subBtnDokter" onclick="switchSubTab('dokter')">[ Dokter ] Beban &amp; Hutang JM</button>
+            </div>
+
+            <!-- SUB TAB: AP LOGISTIK -->
+            <div id="subTabLogistik" class="sub-tab-pane active">
+                <div class="card-section">
+                    <div class="card-header card-header-purple">
+                        <h3>Mapping AP Logistik per Kategori Pengadaan</h3>
+                        <div style="display:flex; gap:8px; align-items:center;">
+                            <button type="button" class="btn-cari-coa" style="background:#7c3aed;" onclick="tambahHutangBaru('LOGISTIK')">+ Tambah Kategori</button>
+                            <span class="badge-tag badge-purple">Tabel: map_set_hutang</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="info-box">
+                            Setiap <b>Kategori Pengadaan</b> (contoh: FARMASI, IPSRS, DAPUR, INVENTARIS) dipetakan ke:
+                            <b>Akun Beban/Persediaan (Debet)</b> dan <b>Akun Hutang Supplier (Kredit)</b>.
+                            Saat gudang menyimpan nota penerimaan, sistem akan mengambil akun dari sini.
+                        </div>
+                        <table class="mapping-tbl" id="tblAPLogistik">
+                            <thead>
+                                <tr>
+                                    <th style="width:180px;">Kode Kategori</th>
+                                    <th style="width:220px;">Nama Kategori / Keterangan</th>
+                                    <th>Akun Beban / Persediaan (DEBET)</th>
+                                    <th>Akun Hutang Supplier (KREDIT)</th>
+                                    <th style="width:130px;">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbodyAPLogistik"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SUB TAB: HUTANG JM DOKTER -->
+            <div id="subTabDokter" class="sub-tab-pane">
+                <div class="card-section">
+                    <div class="card-header card-header-teal">
+                        <h3>Mapping Beban &amp; Hutang Jasa Medis (JM) Dokter</h3>
+                        <div style="display:flex; gap:8px; align-items:center;">
+                            <button type="button" class="btn-cari-coa" style="background:#0f766e;" onclick="tambahHutangBaru('DOKTER')">+ Tambah Jenis JM</button>
+                            <span class="badge-tag badge-teal">Tabel: map_set_hutang</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="info-box" style="background:#f0fdfa; border-left-color:#0d9488; color:#0f766e;">
+                            Setiap <b>Jenis JM Dokter</b> (contoh: JM_RALAN, JM_RANAP, JM_OPERASI, JM_ANESTESI) dipetakan ke:
+                            <b>Akun Beban JM Dokter (Debet)</b> dan <b>Akun Hutang JM Dokter (Kredit)</b>.
+                            Jurnal terbentuk otomatis saat tim JM / keuangan menyimpan perhitungan JM, dengan status <code>Draft</code>.
+                        </div>
+                        <table class="mapping-tbl" id="tblHutangDokter">
+                            <thead>
+                                <tr>
+                                    <th style="width:180px;">Kode Jenis JM</th>
+                                    <th style="width:220px;">Nama Jenis JM / Keterangan</th>
+                                    <th>Akun Beban JM Dokter (DEBET)</th>
+                                    <th>Akun Hutang JM Dokter (KREDIT)</th>
+                                    <th style="width:130px;">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbodyHutangDokter"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div class="toast" id="toastMsg"></div>
+
+<script>
+    const MASTER_TEMPLATE = {
+        "Rawat Jalan": [
+            { kd: "material", nm: "Jasa Sarana RS (material)", pos: "KREDIT" },
+            { kd: "bhp", nm: "BHP Medis / Paket Obat (bhp)", pos: "KREDIT" },
+            { kd: "tarif_tindakandr", nm: "Jasa Medis Dokter (tarif_tindakandr)", pos: "KREDIT" },
+            { kd: "tarif_tindakanpr", nm: "Jasa Medis Perawat (tarif_tindakanpr)", pos: "KREDIT" },
+            { kd: "kso", nm: "KSO Alat (kso)", pos: "KREDIT" },
+            { kd: "menejemen", nm: "Manajemen RS (menejemen)", pos: "KREDIT" }
+        ],
+        "Rawat Inap": [
+            { kd: "material", nm: "Jasa Sarana RS (material)", pos: "KREDIT" },
+            { kd: "bhp", nm: "BHP Medis / Paket Obat (bhp)", pos: "KREDIT" },
+            { kd: "tarif_tindakandr", nm: "Jasa Medis Dokter (tarif_tindakandr)", pos: "KREDIT" },
+            { kd: "tarif_tindakanpr", nm: "Jasa Medis Perawat (tarif_tindakanpr)", pos: "KREDIT" },
+            { kd: "kso", nm: "KSO Alat (kso)", pos: "KREDIT" },
+            { kd: "menejemen", nm: "Manajemen RS (menejemen)", pos: "KREDIT" }
+        ],
+        "Lab": [
+            { kd: "bagian_rs", nm: "Jasa Sarana RS (bagian_rs)", pos: "KREDIT" },
+            { kd: "bhp", nm: "Paket BHP / Reagen (bhp)", pos: "KREDIT" },
+            { kd: "tarif_tindakan_dokter", nm: "Jasa Dokter Lab (tarif_tindakan_dokter)", pos: "KREDIT" },
+            { kd: "tarif_tindakan_petugas", nm: "Jasa Analis / Petugas (tarif_tindakan_petugas)", pos: "KREDIT" },
+            { kd: "tarif_perujuk", nm: "Jasa Dokter Perujuk (tarif_perujuk)", pos: "KREDIT" },
+            { kd: "kso", nm: "KSO Alat Lab (kso)", pos: "KREDIT" },
+            { kd: "menejemen", nm: "Manajemen Lab (menejemen)", pos: "KREDIT" }
+        ],
+        "Radiologi": [
+            { kd: "bagian_rs", nm: "Jasa Sarana RS (bagian_rs)", pos: "KREDIT" },
+            { kd: "bhp", nm: "Paket BHP / Film / Kontras (bhp)", pos: "KREDIT" },
+            { kd: "tarif_tindakan_dokter", nm: "Jasa Dokter Radiolog (tarif_tindakan_dokter)", pos: "KREDIT" },
+            { kd: "tarif_tindakan_petugas", nm: "Jasa Radiografer (tarif_tindakan_petugas)", pos: "KREDIT" },
+            { kd: "tarif_perujuk", nm: "Jasa Dokter Perujuk (tarif_perujuk)", pos: "KREDIT" },
+            { kd: "kso", nm: "KSO Alat Radiologi (kso)", pos: "KREDIT" },
+            { kd: "menejemen", nm: "Manajemen Radiologi (menejemen)", pos: "KREDIT" }
+        ],
+        "Operasi": [
+            { kd: "sarana_akomodasi", nm: "Jasa Sarana & Akomodasi OK (bagian_rs/sarpras)", pos: "KREDIT" },
+            { kd: "sewa_ok", nm: "Sewa Kamar Operasi (sewa_ok)", pos: "KREDIT" },
+            { kd: "alat", nm: "Pemakaian Alat Bedah (alat)", pos: "KREDIT" },
+            { kd: "operator", nm: "Jasa Tim Operator Bedah (operator1..3)", pos: "KREDIT" },
+            { kd: "anestesi", nm: "Jasa Dokter Anestesi (dokter_anestesi)", pos: "KREDIT" },
+            { kd: "anak_resus", nm: "Jasa Dokter Anak / Resusitasi", pos: "KREDIT" },
+            { kd: "paramedis", nm: "Jasa Paramedis / Asisten / Bidan / Omloop", pos: "KREDIT" }
+        ],
+        "Lainnya": [
+            { kat: "Potongan", kd: "potongan_pelayanan", nm: "Potongan / Diskon Biaya Pasien", pos: "DEBET" },
+            { kat: "Farmasi", kd: "obat_ralan", nm: "Pendapatan Obat Rawat Jalan", pos: "KREDIT" },
+            { kat: "Farmasi", kd: "obat_ranap", nm: "Pendapatan Obat Rawat Inap", pos: "KREDIT" },
+            { kat: "PPN", kd: "ppn_keluaran", nm: "Hutang PPN Keluaran Pelayanan", pos: "KREDIT" }
+        ]
+    };
+
+    let mapGlobalSaved = {};
+    let mapPoliSaved = {};
+    let daftarPayor = [];
+    let daftarPoli = [];
+    let daftarAkunBayar = [];
+    let daftarHutang = []; // semua row map_set_hutang
+
+    function initPage() {
+        if (window.javaApp) {
+            window.javaApp.initTable();
+            window.javaApp.getUserInfo();
+            window.javaApp.loadDaftarPoli();
+            window.javaApp.loadMappingGlobal();
+            if (window.javaApp.loadAkunBayarList) {
+                window.javaApp.loadAkunBayarList();
+            }
+            // Muat daftar penjamin dari tabel akun_piutang (master AR)
+            if (window.javaApp.loadAkunPiutangList) {
+                window.javaApp.loadAkunPiutangList();
+            }
+        }
+    }
+
+    function switchTab(tab) {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+        if (tab === 'global') {
+            document.getElementById('tabBtnGlobal').classList.add('active');
+            document.getElementById('tabGlobal').classList.add('active');
+            if (window.javaApp && window.javaApp.loadAkunBayarList) {
+                window.javaApp.loadAkunBayarList();
+            }
+        } else if (tab === 'poli') {
+            document.getElementById('tabBtnPoli').classList.add('active');
+            document.getElementById('tabPoli').classList.add('active');
+            if (daftarPoli.length === 0 && window.javaApp) {
+                window.javaApp.loadDaftarPoli();
+            }
+        } else if (tab === 'ap') {
+            document.getElementById('tabBtnAP').classList.add('active');
+            document.getElementById('tabAP').classList.add('active');
+            if (window.javaApp && window.javaApp.loadMapSetHutang) {
+                window.javaApp.loadMapSetHutang();
+            }
+        }
+    }
+
+    function switchSubTab(sub) {
+        document.querySelectorAll('.sub-tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.sub-tab-pane').forEach(p => p.classList.remove('active'));
+        if (sub === 'logistik') {
+            document.getElementById('subBtnLogistik').classList.add('active');
+            document.getElementById('subTabLogistik').classList.add('active');
+        } else {
+            document.getElementById('subBtnDokter').classList.add('active');
+            document.getElementById('subTabDokter').classList.add('active');
+        }
+    }
+
+    function terimaUserInfo(info) {
+        document.getElementById('userInfo').innerText = "User: " + (info || "-");
+    }
+
+    // terimaPayorOptions dihapus — Section 6 (Penjamin) sudah dihapus.
+    // Ganti dengan terimaAkunPiutangList di bawah.
+
+    function terimaDaftarPoli(jsonStr) {
+        try {
+            daftarPoli = JSON.parse(jsonStr);
+            const sel = document.getElementById('selectPoli');
+            sel.innerHTML = '<option value="">-- Pilih Poliklinik --</option>';
+            daftarPoli.forEach(p => {
+                sel.innerHTML += `<option value="${p.kdPoli}">${p.kdPoli} - ${p.nmPoli}</option>`;
+            });
+        } catch(e) { console.error("Error parse poli:", e); }
+    }
+
+    function terimaMappingGlobal(jsonStr) {
+        try {
+            const arr = JSON.parse(jsonStr);
+            mapGlobalSaved = {};
+            arr.forEach(item => {
+                const key = item.kategori + "|" + item.kdKomponen;
+                mapGlobalSaved[key] = item;
+            });
+            renderAllGlobalTables();
+        } catch(e) { console.error("Error parse mapping global:", e); }
+    }
+
+    function renderAllGlobalTables() {
+        renderTabelMaster("Rawat Jalan", "tblRalan");
+        renderTabelMaster("Rawat Inap", "tblRanap");
+        renderTabelMaster("Lab", "tblLab");
+        renderTabelMaster("Radiologi", "tblRad");
+        renderTabelMaster("Operasi", "tblOperasi");
+        renderTabelLainnya();
+        // renderTabelPayor() dihapus — Section 6 Penjamin sudah dihapus
+        renderTabelAkunPiutang(); // Section 6: Akun Piutang dari tabel akun_piutang
+    }
+
+    function renderTabelMaster(kategori, tblId) {
+        const tbody = document.querySelector("#" + tblId + " tbody");
+        if (!tbody) return;
+        tbody.innerHTML = "";
+        const items = MASTER_TEMPLATE[kategori] || [];
+        items.forEach(it => {
+            const key = kategori + "|" + it.kd;
+            const saved = mapGlobalSaved[key] || { kdRek: "", nmRek: "" };
+            const inputId = "kd_" + sanitizeId(key);
+            const nmId = "nm_" + sanitizeId(key);
+            const rowHtml = `
+                <tr>
+                    <td><b>${it.nm}</b></td>
+                    <td><span class="posisi-badge ${it.pos.toLowerCase()}">${it.pos}</span></td>
+                    <td>
+                        <div class="coa-box">
+                            <input type="text" id="${inputId}" value="${saved.kdRek}" placeholder="Kode Rekening" onchange="cariNamaRekening('${inputId}', '${nmId}')">
+                            <button type="button" class="btn-cari-coa" onclick="bukaDialogRek('${inputId}', '${nmId}')">[ ... ]</button>
+                            <span class="coa-nama-text" id="${nmId}">${saved.nmRek || '(Belum Terpetakan)'}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <button type="button" class="btn-simpan-row" id="btn_g_${sanitizeId(key)}" onclick="simpanGlobal('${kategori}', '${it.kd}', '${escapeStr(it.nm)}', '${inputId}', '${it.pos}', this)">Simpan</button>
+                        <button type="button" class="btn-hapus-row" onclick="resetGlobalRow('${kategori}', '${it.kd}', '${inputId}', '${nmId}')">Reset</button>
+                    </td>
+                </tr>
+            `;
+            tbody.innerHTML += rowHtml;
+        });
+    }
+
+    function renderTabelLainnya() {
+        const tbody = document.querySelector("#tblLainnya tbody");
+        if (!tbody) return;
+        tbody.innerHTML = "";
+        MASTER_TEMPLATE["Lainnya"].forEach(it => {
+            const key = it.kat + "|" + it.kd;
+            const saved = mapGlobalSaved[key] || { kdRek: "", nmRek: "" };
+            const inputId = "kd_" + sanitizeId(key);
+            const nmId = "nm_" + sanitizeId(key);
+            const rowHtml = `
+                <tr>
+                    <td><b>${it.nm}</b></td>
+                    <td><span class="posisi-badge ${it.pos.toLowerCase()}">${it.pos}</span></td>
+                    <td>
+                        <div class="coa-box">
+                            <input type="text" id="${inputId}" value="${saved.kdRek}" placeholder="Kode Rekening" onchange="cariNamaRekening('${inputId}', '${nmId}')">
+                            <button type="button" class="btn-cari-coa" onclick="bukaDialogRek('${inputId}', '${nmId}')">[ ... ]</button>
+                            <span class="coa-nama-text" id="${nmId}">${saved.nmRek || '(Belum Terpetakan)'}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <button type="button" class="btn-simpan-row" id="btn_g_${sanitizeId(key)}" onclick="simpanGlobal('${it.kat}', '${it.kd}', '${escapeStr(it.nm)}', '${inputId}', '${it.pos}', this)">Simpan</button>
+                        <button type="button" class="btn-hapus-row" onclick="resetGlobalRow('${it.kat}', '${it.kd}', '${inputId}', '${nmId}')">Reset</button>
+                    </td>
+                </tr>
+            `;
+            tbody.innerHTML += rowHtml;
+        });
+    }
+
+    // renderTabelPayor() dihapus — Section 6 (Penjamin/Payor lama) sudah dihapus.
+
+    // ============================================================
+    // HANDLER AKUN PIUTANG AR (Section 6 — baca dari tabel akun_piutang)
+    // ============================================================
+    let daftarAkunPiutang = []; // [{kdBayar, caraBayar, kdRek, nmRek}]
+
+    function terimaAkunPiutangList(jsonStr) {
+        try {
+            daftarAkunPiutang = JSON.parse(jsonStr);
+            renderTabelAkunPiutang();
+        } catch(e) { console.error("Error parse akun piutang:", e); }
+    }
+
+    function renderTabelAkunPiutang() {
+        const tbody = document.querySelector("#tblPayorAR tbody");
+        if (!tbody) return;
+        if (daftarAkunPiutang.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#64748b;padding:12px;">'
+                + 'Belum ada data penjamin di tabel <code>akun_piutang</code>. Tambahkan melalui modul DlgAkunPiutang terlebih dahulu.'
+                + '</td></tr>';
+            return;
+        }
+        tbody.innerHTML = "";
+        daftarAkunPiutang.forEach(p => {
+            const inputId = "kd_ap_" + sanitizeId(p.kdBayar);
+            const nmId    = "nm_ap_" + sanitizeId(p.kdBayar);
+            const label   = p.kdBayar + " - " + p.caraBayar;
+            const rowHtml = `
+                <tr>
+                    <td><b>${label}</b></td>
+                    <td><span class="posisi-badge debet">DEBET</span></td>
+                    <td>
+                        <div class="coa-box">
+                            <input type="text" id="${inputId}" value="${p.kdRek || ''}" placeholder="Akun Piutang (Debet)" onchange="cariNamaRekening('${inputId}', '${nmId}')">
+                            <button type="button" class="btn-cari-coa" onclick="bukaDialogRek('${inputId}', '${nmId}')">[ ... ]</button>
+                            <span class="coa-nama-text" id="${nmId}">${p.nmRek || '(Belum Terpetakan)'}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <button type="button" class="btn-simpan-row" id="btn_ap_${sanitizeId(p.kdBayar)}" onclick="simpanAkunPiutangCOA('${escapeStr(p.kdBayar)}', '${inputId}', this)">Simpan</button>
+                        <button type="button" class="btn-hapus-row" onclick="resetAkunPiutangRow('${escapeStr(p.kdBayar)}', '${inputId}', '${nmId}')">Reset</button>
+                    </td>
+                </tr>
+            `;
+            tbody.innerHTML += rowHtml;
+        });
+    }
+
+    const inFlightAkunPiutang = {};
+    function simpanAkunPiutangCOA(kdBayar, inputId, btnEl) {
+        if (inFlightAkunPiutang[kdBayar]) return;
+        const kdRek = document.getElementById(inputId).value.trim();
+        if (!kdRek) {
+            showToast("Kode Rekening tidak boleh kosong!", "error");
+            return;
+        }
+        inFlightAkunPiutang[kdBayar] = true;
+        if (btnEl) {
+            btnEl.disabled = true;
+            btnEl.dataset.origText = btnEl.innerText;
+            btnEl.innerText = "Menyimpan...";
+            btnEl.style.opacity = "0.6";
+        }
+        if (window.javaApp && window.javaApp.simpanCOAAkunPiutang) {
+            window.javaApp.simpanCOAAkunPiutang(kdBayar, kdRek);
+        }
+        setTimeout(() => {
+            if (inFlightAkunPiutang[kdBayar]) {
+                delete inFlightAkunPiutang[kdBayar];
+                if (btnEl) {
+                    btnEl.disabled = false;
+                    btnEl.innerText = btnEl.dataset.origText || "Simpan";
+                    btnEl.style.opacity = "1";
+                }
+            }
+        }, 4000);
+    }
+
+    function simpanAkunPiutangSelesai(status, kdBayar) {
+        delete inFlightAkunPiutang[kdBayar];
+        document.querySelectorAll('#tblPayorAR .btn-simpan-row').forEach(b => {
+            b.disabled = false;
+            b.innerText = "Simpan";
+            b.style.opacity = "1";
+        });
+        if (status === "OK") {
+            showToast("Akun Piutang '" + kdBayar + "' berhasil disimpan!", "success");
+            if (window.javaApp && window.javaApp.loadAkunPiutangList) {
+                window.javaApp.loadAkunPiutangList();
+            }
+        } else {
+            showToast("Gagal menyimpan akun piutang: " + status, "error");
+        }
+    }
+
+    function resetAkunPiutangRow(kdBayar, inputId, nmId) {
+        if (confirm("Reset akun COA piutang untuk '" + kdBayar + "'?")) {
+            const inp = document.getElementById(inputId);
+            const nm  = document.getElementById(nmId);
+            if (inp) inp.value = "";
+            if (nm)  nm.innerText = "(Belum Terpetakan)";
+            if (window.javaApp && window.javaApp.simpanCOAAkunPiutang) {
+                window.javaApp.simpanCOAAkunPiutang(kdBayar, "");
+            }
+        }
+    }
+
+    function onPoliChanged() {
+        const sel = document.getElementById('selectPoli');
+        const kdPoli = sel.value;
+        if (!kdPoli) {
+            document.getElementById('cardPoliDetail').style.display = 'none';
+            return;
+        }
+        loadPoliData();
+    }
+
+    function loadPoliData() {
+        const sel = document.getElementById('selectPoli');
+        const kdPoli = sel.value;
+        if (!kdPoli) {
+            showToast("Pilih poliklinik terlebih dahulu!", "error");
+            return;
+        }
+        const textPoli = sel.options[sel.selectedIndex].text;
+        document.getElementById('lblPoliDipilih').innerText = "Pemetaan Khusus: " + textPoli;
+        document.getElementById('cardPoliDetail').style.display = 'block';
+        if (window.javaApp) {
+            window.javaApp.loadMappingPoli(kdPoli);
+        }
+    }
+
+    function terimaMappingPoli(jsonStr) {
+        try {
+            const arr = JSON.parse(jsonStr);
+            mapPoliSaved = {};
+            arr.forEach(it => {
+                mapPoliSaved[it.kdKomponen] = it;
+            });
+            renderTabelPoliOverride();
+        } catch(e) { console.error("Error parse mapping poli:", e); }
+    }
+
+    function renderTabelPoliOverride() {
+        const tbody = document.querySelector("#tblPoliOverride tbody");
+        if (!tbody) return;
+        tbody.innerHTML = "";
+        const sel = document.getElementById('selectPoli');
+        const kdPoli = sel.value;
+        const nmPoli = sel.options[sel.selectedIndex].text;
+
+        MASTER_TEMPLATE["Rawat Jalan"].forEach(it => {
+            const saved = mapPoliSaved[it.kd] || { kdRek: "", nmRek: "" };
+            const inputId = "poli_kd_" + it.kd;
+            const nmId = "poli_nm_" + it.kd;
+            const rowHtml = `
+                <tr>
+                    <td><b>${it.nm}</b></td>
+                    <td><span class="posisi-badge ${it.pos.toLowerCase()}">${it.pos}</span></td>
+                    <td>
+                        <div class="coa-box">
+                            <input type="text" id="${inputId}" value="${saved.kdRek}" placeholder="Kosong = Ikut Global Tab A" onchange="cariNamaRekening('${inputId}', '${nmId}')">
+                            <button type="button" class="btn-cari-coa" onclick="bukaDialogRek('${inputId}', '${nmId}')">[ ... ]</button>
+                            <span class="coa-nama-text" id="${nmId}">${saved.nmRek || '(Mengikuti Akun Global Tab A)'}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <button type="button" class="btn-simpan-row" id="btn_p_${it.kd}" onclick="simpanPoli('${kdPoli}', '${escapeStr(nmPoli)}', '${it.kd}', '${escapeStr(it.nm)}', '${inputId}', this)">Simpan</button>
+                        ${saved.kdRek ? `<button type="button" class="btn-hapus-row" onclick="hapusPoli('${kdPoli}', '${it.kd}')">Reset</button>` : ''}
+                    </td>
+                </tr>
+            `;
+            tbody.innerHTML += rowHtml;
+        });
+    }
+
+    function sanitizeId(str) {
+        return str.replace(/[^a-zA-Z0-9]/g, '_');
+    }
+
+    function escapeStr(s) {
+        if (!s) return "";
+        return s.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+    }
+
+    let activeInputId = null;
+    let activeNameId = null;
+
+    function bukaDialogRek(inputId, nameId) {
+        activeInputId = inputId;
+        activeNameId = nameId;
+        if (window.javaApp) {
+            window.javaApp.bukaCariRekening(inputId + "||" + nameId);
+        }
+    }
+
+    function setCoaDariDialog(rowKey, kd, nm) {
+        const parts = rowKey.split("||");
+        const inp = document.getElementById(parts[0]);
+        const lbl = document.getElementById(parts[1]);
+        if (inp) inp.value = kd;
+        if (lbl) lbl.innerText = nm;
+    }
+
+    function cariNamaRekening(inputId, nameId) {
+        const kd = document.getElementById(inputId).value.trim();
+        if (!kd) {
+            document.getElementById(nameId).innerText = '(Belum Terpetakan)';
+            return;
+        }
+        if (window.javaApp) {
+            window.javaApp.cariRekening(kd, inputId + "||" + nameId);
+        }
+    }
+
+    function setNamaRekening(key, kd, nm) {
+        const parts = key.split("||");
+        const lbl = document.getElementById(parts[1]);
+        if (lbl) {
+            lbl.innerText = nm || 'Kode Rekening Tidak Ditemukan!';
+        }
+    }
+
+    const inFlightGlobal = {};
+    function simpanGlobal(kategori, kdKomponen, namaKomponen, inputId, posisi, btnEl) {
+        const lockKey = kategori + "|" + kdKomponen;
+        if (inFlightGlobal[lockKey]) {
+            return;
+        }
+        const kdRek = document.getElementById(inputId).value.trim();
+        if (!kdRek) {
+            showToast("Kode Rekening tidak boleh kosong!", "error");
+            return;
+        }
+        inFlightGlobal[lockKey] = true;
+        if (btnEl) {
+            btnEl.disabled = true;
+            btnEl.dataset.origText = btnEl.innerText;
+            btnEl.innerText = "Menyimpan...";
+            btnEl.style.opacity = "0.6";
+            btnEl.style.pointerEvents = "none";
+        }
+        if (window.javaApp) {
+            window.javaApp.simpanMappingGlobal(kategori, kdKomponen, namaKomponen, kdRek, posisi);
+        }
+        // Fallback timeout jika notif telat agar tombol tidak terkunci selamanya
+        setTimeout(() => {
+            if (inFlightGlobal[lockKey]) {
+                delete inFlightGlobal[lockKey];
+                if (btnEl) {
+                    btnEl.disabled = false;
+                    btnEl.innerText = btnEl.dataset.origText || "Simpan";
+                    btnEl.style.opacity = "1";
+                    btnEl.style.pointerEvents = "auto";
+                }
+            }
+        }, 4000);
+    }
+
+    function simpanGlobalSelesai(status, kdKomponen) {
+        for (let k in inFlightGlobal) delete inFlightGlobal[k];
+        document.querySelectorAll('.btn-simpan-row').forEach(b => {
+            b.disabled = false;
+            b.innerText = "Simpan";
+            b.style.opacity = "1";
+            b.style.pointerEvents = "auto";
+        });
+        if (status === "OK") {
+            showToast("Mapping berhasil disimpan!", "success");
+            if (window.javaApp) window.javaApp.loadMappingGlobal();
+        } else {
+            showToast("Gagal menyimpan: " + status, "error");
+            if (window.javaApp) window.javaApp.loadMappingGlobal();
+        }
+    }
+
+    function resetGlobalRow(kategori, kdKomponen, inputId, nmId) {
+        const key = kategori + "|" + kdKomponen;
+        const inp = document.getElementById(inputId);
+        const lbl = document.getElementById(nmId);
+        if (inp) inp.value = "";
+        if (lbl) lbl.innerText = "(Belum Terpetakan)";
+
+        if (mapGlobalSaved[key] && mapGlobalSaved[key].kdRek) {
+            if (confirm("Reset akun mapping untuk " + kdKomponen + "?")) {
+                delete mapGlobalSaved[key];
+                if (window.javaApp) {
+                    window.javaApp.hapusMappingGlobal(kategori, kdKomponen);
+                }
+            }
+        } else {
+            showToast("Input di-reset.", "success");
+        }
+    }
+
+    function hapusGlobal(kategori, kdKomponen) {
+        if (confirm("Reset akun mapping komponen ini?")) {
+            if (window.javaApp) {
+                window.javaApp.hapusMappingGlobal(kategori, kdKomponen);
+            }
+        }
+    }
+
+    function hapusGlobalSelesai(status) {
+        if (status === "OK") {
+            showToast("Mapping berhasil di-reset!", "success");
+            if (window.javaApp) window.javaApp.loadMappingGlobal();
+        } else {
+            showToast("Gagal reset mapping: " + status, "error");
+        }
+    }
+
+    const inFlightPoli = {};
+    function simpanPoli(kdPoli, nmPoli, kdKomponen, namaKomponen, inputId, btnEl) {
+        const lockKey = kdPoli + "|" + kdKomponen;
+        if (inFlightPoli[lockKey]) return;
+        const kdRek = document.getElementById(inputId).value.trim();
+        if (!kdRek) {
+            showToast("Masukkan kode rekening override poli!", "error");
+            return;
+        }
+        inFlightPoli[lockKey] = true;
+        if (btnEl) {
+            btnEl.disabled = true;
+            btnEl.innerText = "Menyimpan...";
+            btnEl.style.opacity = "0.6";
+        }
+        if (window.javaApp) {
+            window.javaApp.simpanMappingPoli(kdPoli, nmPoli, "Rawat Jalan", kdKomponen, namaKomponen, kdRek);
+        }
+    }
+
+    function simpanPoliSelesai(status, kdKomponen) {
+        for (let k in inFlightPoli) delete inFlightPoli[k];
+        if (status === "OK") {
+            showToast("Mapping Poli berhasil disimpan!", "success");
+            const sel = document.getElementById('selectPoli');
+            if (window.javaApp && sel.value) window.javaApp.loadMappingPoli(sel.value);
+        } else {
+            showToast("Gagal simpan poli: " + status, "error");
+            const sel = document.getElementById('selectPoli');
+            if (window.javaApp && sel.value) window.javaApp.loadMappingPoli(sel.value);
+        }
+    }
+
+    function hapusPoli(kdPoli, kdKomponen) {
+        if (confirm("Reset akun poli ini kembali ke default Tab A (Global)?")) {
+            if (window.javaApp) {
+                window.javaApp.hapusMappingPoli(kdPoli, kdKomponen);
+            }
+        }
+    }
+
+    function hapusPoliSelesai(status) {
+        if (status === "OK") {
+            showToast("Mapping Poli di-reset ke global!", "success");
+            const sel = document.getElementById('selectPoli');
+            if (window.javaApp && sel.value) window.javaApp.loadMappingPoli(sel.value);
+        } else {
+            showToast("Gagal reset: " + status, "error");
+        }
+    }
+
+    function showToast(msg, type) {
+        const t = document.getElementById('toastMsg');
+        t.innerText = msg;
+        t.className = "toast " + type + " show";
+        setTimeout(() => { t.className = "toast"; }, 3000);
+    }
+
+    // ============================================================
+    // HANDLER TAB C — AP LOGISTIK & HUTANG JM DOKTER (map_set_hutang)
+    // ============================================================
+
+    function terimaMapSetHutang(jsonStr) {
+        try {
+            daftarHutang = JSON.parse(jsonStr);
+            renderTabelAPLogistik();
+            renderTabelHutangDokter();
+        } catch(e) { console.error("Error parse map_set_hutang:", e); }
+    }
+
+    function renderTabelAPLogistik() {
+        const tbody = document.getElementById('tbodyAPLogistik');
+        if (!tbody) return;
+        const rows = daftarHutang.filter(r => r.tipeHutang === 'LOGISTIK');
+        if (rows.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#64748b;padding:12px;">Belum ada mapping AP Logistik. Klik "+ Tambah Kategori" untuk menambahkan.</td></tr>';
+            return;
+        }
+        tbody.innerHTML = '';
+        rows.forEach(item => renderRowHutang(tbody, item, 'LOGISTIK'));
+    }
+
+    function renderTabelHutangDokter() {
+        const tbody = document.getElementById('tbodyHutangDokter');
+        if (!tbody) return;
+        const rows = daftarHutang.filter(r => r.tipeHutang === 'DOKTER');
+        if (rows.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#64748b;padding:12px;">Belum ada mapping Hutang JM Dokter. Klik "+ Tambah Jenis JM" untuk menambahkan.</td></tr>';
+            return;
+        }
+        tbody.innerHTML = '';
+        rows.forEach(item => renderRowHutang(tbody, item, 'DOKTER'));
+    }
+
+    function renderRowHutang(tbody, item, tipeHutang) {
+        const idD = 'ht_d_' + sanitizeId(item.kodeHutang);
+        const idDnm = 'ht_dnm_' + sanitizeId(item.kodeHutang);
+        const idK = 'ht_k_' + sanitizeId(item.kodeHutang);
+        const idKnm = 'ht_knm_' + sanitizeId(item.kodeHutang);
+        const colorHapus = tipeHutang === 'DOKTER' ? '#0f766e' : '#7c3aed';
+        const rowHtml = `
+            <tr id="row_ht_${sanitizeId(item.kodeHutang)}">
+                <td><b>${item.kodeHutang}</b></td>
+                <td style="font-size:12px;color:#334155;">${item.keterangan || '-'}</td>
+                <td>
+                    <div class="coa-box">
+                        <input type="text" id="${idD}" value="${item.kdRekDebet || ''}" placeholder="Kode Akun Beban" onchange="cariNamaRekening('${idD}', '${idDnm}')">
+                        <button type="button" class="btn-cari-coa" onclick="bukaDialogRek('${idD}', '${idDnm}')">[ ... ]</button>
+                        <span class="coa-nama-text" id="${idDnm}">${item.nmRekDebet || '(Belum Terpetakan)'}</span>
+                    </div>
+                </td>
+                <td>
+                    <div class="coa-box">
+                        <input type="text" id="${idK}" value="${item.kdRekKredit || ''}" placeholder="Kode Akun Hutang" onchange="cariNamaRekening('${idK}', '${idKnm}')">
+                        <button type="button" class="btn-cari-coa" onclick="bukaDialogRek('${idK}', '${idKnm}')">[ ... ]</button>
+                        <span class="coa-nama-text" id="${idKnm}">${item.nmRekKredit || '(Belum Terpetakan)'}</span>
+                    </div>
+                </td>
+                <td>
+                    <button type="button" class="btn-simpan-row" onclick="simpanHutang('${item.kodeHutang}', '${tipeHutang}', '${idD}', '${idK}', this)">Simpan</button>
+                    <button type="button" class="btn-hapus-row" style="background:${colorHapus};" onclick="hapusHutang('${item.kodeHutang}', '${tipeHutang}')">Hapus</button>
+                </td>
+            </tr>
+        `;
+        tbody.innerHTML += rowHtml;
+    }
+
+    function tambahHutangBaru(tipeHutang) {
+        const label = tipeHutang === 'LOGISTIK' ? 'kode kategori logistik (contoh: FARMASI, IPSRS, DAPUR, INVENTARIS, TOKO)' : 'kode jenis JM (contoh: JM_RALAN, JM_RANAP, JM_OPERASI, JM_ANESTESI)';
+        const kode = prompt('Masukkan ' + label + ':');
+        if (!kode || !kode.trim()) return;
+        const kodeClean = kode.trim().toUpperCase();
+        const keterangan = prompt('Keterangan singkat (opsional):') || '';
+        const exists = daftarHutang.some(r => r.kodeHutang === kodeClean && r.tipeHutang === tipeHutang);
+        if (exists) {
+            showToast("Kode '" + kodeClean + "' sudah terdaftar!", 'error');
+            return;
+        }
+        daftarHutang.push({ kodeHutang: kodeClean, tipeHutang: tipeHutang, keterangan: keterangan, kdRekDebet: '', nmRekDebet: '', kdRekKredit: '', nmRekKredit: '' });
+        if (tipeHutang === 'LOGISTIK') renderTabelAPLogistik();
+        else renderTabelHutangDokter();
+        showToast("'" + kodeClean + "' ditambahkan. Pilih COA lalu klik Simpan.", 'success');
+    }
+
+    const inFlightHutang = {};
+    function simpanHutang(kodeHutang, tipeHutang, idDebet, idKredit, btnEl) {
+        const lockKey = tipeHutang + '|' + kodeHutang;
+        if (inFlightHutang[lockKey]) return;
+        const kdDebet  = document.getElementById(idDebet).value.trim();
+        const kdKredit = document.getElementById(idKredit).value.trim();
+        if (!kdDebet || !kdKredit) {
+            showToast('Kode Akun Beban (Debet) dan Hutang (Kredit) harus diisi!', 'error');
+            return;
+        }
+        inFlightHutang[lockKey] = true;
+        if (btnEl) { btnEl.disabled = true; btnEl.innerText = 'Menyimpan...'; btnEl.style.opacity = '0.6'; }
+        const item = daftarHutang.find(r => r.kodeHutang === kodeHutang && r.tipeHutang === tipeHutang);
+        const keterangan = item ? item.keterangan : '';
+        if (window.javaApp && window.javaApp.simpanMapSetHutang) {
+            window.javaApp.simpanMapSetHutang(kodeHutang, tipeHutang, keterangan, kdDebet, kdKredit);
+        }
+        setTimeout(() => {
+            if (inFlightHutang[lockKey]) {
+                delete inFlightHutang[lockKey];
+                if (btnEl) { btnEl.disabled = false; btnEl.innerText = 'Simpan'; btnEl.style.opacity = '1'; }
+            }
+        }, 4000);
+    }
+
+    function simpanHutangSelesai(status, kodeHutang) {
+        for (let k in inFlightHutang) delete inFlightHutang[k];
+        if (status === 'OK') {
+            showToast('Mapping AP \'' + kodeHutang + '\' berhasil disimpan!', 'success');
+        } else {
+            showToast('Gagal simpan: ' + status, 'error');
+        }
+        if (window.javaApp && window.javaApp.loadMapSetHutang) window.javaApp.loadMapSetHutang();
+    }
+
+    function hapusHutang(kodeHutang, tipeHutang) {
+        if (!confirm('Hapus mapping \'' + kodeHutang + '\' dari ' + tipeHutang + '?')) return;
+        if (window.javaApp && window.javaApp.hapusMapSetHutang) {
+            window.javaApp.hapusMapSetHutang(kodeHutang, tipeHutang);
+        }
+    }
+
+    function hapusHutangSelesai(status) {
+        if (status === 'OK') {
+            showToast('Mapping berhasil dihapus!', 'success');
+        } else {
+            showToast('Gagal hapus: ' + status, 'error');
+        }
+        if (window.javaApp && window.javaApp.loadMapSetHutang) window.javaApp.loadMapSetHutang();
+    }
+
+    // ============================================================
+    // HANDLER AKUN BAYAR / METODE PEMBAYARAN KASIR
+    // ============================================================
+    function terimaAkunBayarList(jsonStr) {
+        try {
+            daftarAkunBayar = JSON.parse(jsonStr);
+            renderTabelAkunBayar();
+        } catch(e) { console.error("Error parse akun bayar:", e); }
+    }
+
+    function renderTabelAkunBayar() {
+        const tbody = document.getElementById("tbodyAkunBayar");
+        if (!tbody) return;
+        tbody.innerHTML = "";
+        if (!daftarAkunBayar || daftarAkunBayar.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#64748b;padding:12px;">Belum ada metode bayar. Klik tombol "+ Tambah Metode Bayar" di atas untuk menambahkan.</td></tr>';
+            return;
+        }
+        daftarAkunBayar.forEach(item => {
+            const key = "AkunBayar|" + item.namaBayar;
+            const inputId = "kd_" + sanitizeId(key);
+            const nmId = "nm_" + sanitizeId(key);
+            const rowHtml = `
+                <tr>
+                    <td><b>${item.namaBayar}</b></td>
+                    <td><span class="posisi-badge debet">DEBET</span></td>
+                    <td>
+                        <div class="coa-box">
+                            <input type="text" id="${inputId}" value="${item.kdRek || ''}" placeholder="Kode Rekening" onchange="cariNamaRekening('${inputId}', '${nmId}')">
+                            <button type="button" class="btn-cari-coa" onclick="bukaDialogRek('${inputId}', '${nmId}')">[ ... ]</button>
+                            <span class="coa-nama-text" id="${nmId}">${item.nmRek || '(Belum Terpetakan)'}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <button type="button" class="btn-simpan-row" id="btn_ab_${sanitizeId(key)}" onclick="simpanAkunBayar('${escapeStr(item.namaBayar)}', '${inputId}', this)">Simpan</button>
+                        <button type="button" class="btn-hapus-row" onclick="hapusAkunBayar('${escapeStr(item.namaBayar)}', '${inputId}', '${nmId}')">Reset</button>
+                    </td>
+                </tr>
+            `;
+            tbody.innerHTML += rowHtml;
+        });
+    }
+
+    function simpanAkunBayar(namaBayar, inputId, btnEl) {
+        const kdRek = document.getElementById(inputId).value.trim();
+        if (!kdRek) {
+            showToast("Kode Rekening tidak boleh kosong!", "error");
+            return;
+        }
+        if (btnEl) {
+            btnEl.disabled = true;
+            btnEl.dataset.origText = btnEl.innerText;
+            btnEl.innerText = "Menyimpan...";
+            btnEl.style.opacity = "0.6";
+        }
+        if (window.javaApp && window.javaApp.simpanMappingAkunBayar) {
+            window.javaApp.simpanMappingAkunBayar(namaBayar, kdRek, 0);
+        }
+        setTimeout(() => {
+            if (btnEl && btnEl.disabled) {
+                btnEl.disabled = false;
+                btnEl.innerText = btnEl.dataset.origText || "Simpan";
+                btnEl.style.opacity = "1";
+            }
+        }, 4000);
+    }
+
+    function simpanAkunBayarSelesai(status, namaBayar) {
+        document.querySelectorAll('#tblAkunBayar .btn-simpan-row').forEach(b => {
+            b.disabled = false;
+            b.innerText = "Simpan";
+            b.style.opacity = "1";
+        });
+        if (status === "OK") {
+            showToast("Akun bayar " + namaBayar + " berhasil disimpan!", "success");
+            if (window.javaApp && window.javaApp.loadAkunBayarList) {
+                window.javaApp.loadAkunBayarList();
+            }
+        } else {
+            showToast("Gagal menyimpan akun bayar: " + status, "error");
+            if (window.javaApp && window.javaApp.loadAkunBayarList) {
+                window.javaApp.loadAkunBayarList();
+            }
+        }
+    }
+
+    function hapusAkunBayar(namaBayar, inputId, nmId) {
+        if (confirm("Reset akun rekening untuk metode bayar '" + namaBayar + "'?")) {
+            const inp = document.getElementById(inputId);
+            const nm = document.getElementById(nmId);
+            if (inp) inp.value = "";
+            if (nm) nm.innerText = "(Belum Terpetakan)";
+            if (window.javaApp && window.javaApp.hapusMappingAkunBayar) {
+                window.javaApp.hapusMappingAkunBayar(namaBayar);
+            }
+        }
+    }
+
+    function hapusAkunBayarSelesai(status) {
+        if (status === "OK") {
+            showToast("Akun bayar berhasil di-reset!", "success");
+            if (window.javaApp && window.javaApp.loadAkunBayarList) {
+                window.javaApp.loadAkunBayarList();
+            }
+        } else {
+            showToast("Gagal reset akun bayar: " + status, "error");
+        }
+    }
+
+    function tambahAkunBayarBaru() {
+        const namaBaru = prompt("Masukkan nama akun / metode pembayaran baru (misal: Transfer Mandiri, QRIS BCA, EDC BNI):");
+        if (!namaBaru || !namaBaru.trim()) return;
+        const cleanName = namaBaru.trim();
+        const exists = daftarAkunBayar.some(x => x.namaBayar.toLowerCase() === cleanName.toLowerCase());
+        if (exists) {
+            showToast("Metode bayar '" + cleanName + "' sudah terdaftar di tabel.", "error");
+            return;
+        }
+        daftarAkunBayar.push({ namaBayar: cleanName, kdRek: "", nmRek: "", ppn: 0, posisi: "DEBET" });
+        renderTabelAkunBayar();
+        showToast("Metode bayar '" + cleanName + "' ditambahkan ke daftar. Silakan pilih kode rekening dan klik Simpan.", "success");
+    }
+
+    function keluar() {
+        try {
+            if (window.javaApp && typeof window.javaApp.keluarForm === 'function') {
+                window.javaApp.keluarForm();
+            } else {
+                window.close();
+            }
+        } catch (e) {
+            console.error("Gagal memanggil keluarForm:", e);
+        }
+    }
+</script>
+</body>
+</html>

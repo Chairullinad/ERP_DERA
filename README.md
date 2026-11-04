@@ -15,3 +15,15 @@ Repositori kustomisasi modul ERP & SIMRS karya Dessy Rahmawati Chairullina (chai
 - **src/keuangan/DlgBilingRalan.java**: Penyesuaian billing rawat jalan.
 - **src/fungsi/KalkulatorJasaMedisDokter.java**: Kelas pembantu kalkulator logika perhitungan jasa medis dinamis.
 - **documentation_log/ATURAN_BAYAR_JM_DOKTER_BPJS.md**: Dokumentasi aturan kalkulasi & bisnis jasa medis BPJS.
+
+### 2. Modul Akuntansi & Jurnal Modern (Web Interface / JavaFX WebView)
+- **src/keuangan/DlgJurnalTransaksiWeb.java** ➕ **src/resources/jurnal_transaksi.html**: Antarmuka modern web untuk pencatatan dan monitoring jurnal transaksi akuntansi.
+- **src/keuangan/DlgPostingJurnalWeb.java** ➕ **src/resources/posting_jurnal.html**: Antarmuka modern web untuk posting jurnal harian terintegrasi.
+- **src/keuangan/DlgBukuBesarWeb.java** ➕ **src/resources/buku_besar.html**: Modul Buku Besar SAK Baru (*buku_besar_new*) dengan kalkulasi *running balance*.
+- **src/keuangan/DlgPenyusutanAsetWeb.java** ➕ **src/resources/penyusutan_aset.html**: Modul web terpadu depresiasi dan penyusutan aset (metode garis lurus, sinkronisasi data master, dan posting jurnal otomatis).
+- **src/keuangan/DlgValidasiJurnalHPPJMDokterWeb.java** ➕ **src/resources/validasi_jurnal_hpp_jm.html**: Modul validasi dan rekonsiliasi jurnal HPP JM Dokter.
+- **src/resources/mapping_coa.html**: Antarmuka mapping Chart of Accounts (COA) visual.
+
+## Dokumentasi & UAT
+- **docs/UAT_DlgJurnalTransaksiWeb_DlgPostingJurnalWeb.docx & .pdf**: Dokumen User Acceptance Testing (UAT) Jurnal Transaksi & Posting Jurnal.
+- **docs/Logbook_Fitur_JurnalTransaksiWeb_PostingJurnalWeb.docx & .pdf**: Logbook pengembangan fitur Jurnal Web.

@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Depresiasi & Penyusutan Aset - SIMRS Khanza</title>
+    <style>
+        :root {
+            --primary: #0f766e;
+            --primary-hover: #115e59;
+            --primary-light: #ccfbf1;
+            --secondary: #3b82f6;
+            --success: #16a34a;
+            --warning: #d97706;
+            --warning-light: #fef3c7;
+            --danger: #dc2626;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --border: #e2e8f0;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-size: 13px;
+        }
+
+        body {
+            background-color: #f1f5f9;
+            color: var(--text-main);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* HEADER */
+        .app-header {
+            background: #ffffff;
+            padding: 10px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            flex-shrink: 0;
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-title h1 {
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .badge-hospital {
+            background: var(--primary-light);
+            color: var(--primary);
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: all 0.15s ease;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: #ffffff;
+        }
+        .btn-primary:hover { background: var(--primary-hover); }
+
+        .btn-outline {
+            background: #ffffff;
+            border-color: var(--border);
+            color: var(--text-main);
+        }
+        .btn-outline:hover { background: #f8fafc; border-color: #cbd5e1; }
+
+        .btn-success {
+            background: var(--success);
+            color: #ffffff;
+        }
+        .btn-success:hover { background: #15803d; }
+
+        .btn-warning {
+            background: var(--warning);
+            color: #ffffff;
+        }
+        .btn-warning:hover { background: #b45309; }
+
+        .btn-sm {
+            padding: 4px 8px;
+            font-size: 11px;
+        }
+
+        /* KPI CARDS */
+        .kpi-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            padding: 12px 20px 0 20px;
+            flex-shrink: 0;
+        }
+
+        .kpi-card {
+            background: #ffffff;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+        }
+
+        .kpi-card.c1::before { background: var(--secondary); }
+        .kpi-card.c2::before { background: var(--warning); }
+        .kpi-card.c3::before { background: var(--danger); }
+        .kpi-card.c4::before { background: var(--success); }
+
+        .kpi-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .kpi-value {
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .kpi-sub {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        /* TAB BAR & FILTER */
+        .nav-and-filter {
+            padding: 12px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+
+        .tab-bar {
+            display: flex;
+            gap: 6px;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 2px;
+        }
+
+        .tab-item {
+            padding: 6px 16px;
+            border-radius: 6px 6px 0 0;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--text-muted);
+            border-bottom: 2px solid transparent;
+            margin-bottom: -4px;
+        }
+
+        .tab-item.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+            background: #ffffff;
+        }
+
+        .filter-box {
+            background: #ffffff;
+            padding: 10px 14px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .form-group {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+
+        input[type="text"], input[type="date"], input[type="number"], select {
+            padding: 5px 10px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: #f8fafc;
+            outline: none;
+            color: var(--text-main);
+        }
+
+        input:focus, select:focus {
+            border-color: var(--primary);
+            background: #ffffff;
+        }
+
+        /* TABLE CONTAINER */
+        .content-area {
+            flex: 1;
+            padding: 0 20px 12px 20px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .table-wrap {
+            flex: 1;
+            background: #ffffff;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            overflow: auto;
+            position: relative;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        thead {
+            position: sticky;
+            top: 0;
+            background: #f8fafc;
+            z-index: 10;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        th {
+            padding: 9px 12px;
+            font-weight: 600;
+            font-size: 11px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border);
+        }
+
+        td {
+            padding: 7px 12px;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 12px;
+        }
+
+        tbody tr:hover {
+            background-color: #f8fafc;
+        }
+
+        .text-right { text-align: right; }
+        .text-center { text-align: center; }
+
+        .badge {
+            padding: 2px 7px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .badge-sync-ok { background: #dcfce7; color: #166534; }
+        .badge-sync-diff {
+            background: #fee2e2;
+            color: #991b1b;
+            cursor: pointer;
+            border: 1px dashed #ef4444;
+        }
+        .badge-sync-diff:hover { background: #fecaca; }
+
+        .badge-processed { background: #e0e7ff; color: #3730a3; }
+        .badge-pending { background: #fef3c7; color: #92400e; }
+
+        /* BOTTOM ACTIONS */
+        .bottom-bar {
+            padding: 10px 0 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        /* MODAL */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(2px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+        }
+
+        .modal-box {
+            background: #ffffff;
+            border-radius: 10px;
+            width: 480px;
+            max-width: 90%;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            overflow: hidden;
+            animation: modalIn 0.15s ease-out;
+        }
+
+        @keyframes modalIn {
+            from { transform: scale(0.95); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-header {
+            padding: 12px 18px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8fafc;
+        }
+
+        .modal-header h3 {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .modal-body {
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .modal-body .form-field {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .modal-body .form-field label {
+            font-weight: 600;
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .modal-footer {
+            padding: 12px 18px;
+            background: #f8fafc;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        .alert-box {
+            background: var(--warning-light);
+            border: 1px solid #fde68a;
+            color: #92400e;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 11px;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <div class="app-header">
+        <div class="header-title">
+            <h1>Depresiasi & Penyusutan Aset</h1>
+            <span class="badge-hospital">Modul Akuntansi Terpadu</span>
+        </div>
+        <div class="header-actions">
+            <button class="btn btn-outline btn-sm" onclick="bukaLabaRugi()" title="Buka Laporan Laba Rugi">Laba Rugi</button>
+            <button class="btn btn-outline btn-sm" onclick="bukaNeracaSaldo()" title="Buka Neraca Saldo">Neraca Saldo</button>
+            <button class="btn btn-outline btn-sm" onclick="keluarForm()" title="Tutup Menu">Tutup</button>
+        </div>
+    </div>
+
+    <!-- KPI CARDS -->
+    <div class="kpi-container">
+        <div class="kpi-card c1">
+            <div class="kpi-label">Total Nilai Perolehan</div>
+            <div class="kpi-value" id="kpiTotalPerolehan">Rp 0</div>
+            <div class="kpi-sub" id="kpiTotalItem">0 Unit Barang Terdata</div>
+        </div>
+        <div class="kpi-card c2">
+            <div class="kpi-label">Beban Susut Bulan Ini</div>
+            <div class="kpi-value" id="kpiBebanBulanIni">Rp 0</div>
+            <div class="kpi-sub">Beban Operasional Berjalan</div>
+        </div>
+        <div class="kpi-card c3">
+            <div class="kpi-label">Akumulasi Penyusutan</div>
+            <div class="kpi-value" id="kpiTotalAkumulasi">Rp 0</div>
+            <div class="kpi-sub">Total Pengurang Aktiva Tetap</div>
+        </div>
+        <div class="kpi-card c4">
+            <div class="kpi-label">Total Nilai Buku</div>
+            <div class="kpi-value" id="kpiTotalNilaiBuku">Rp 0</div>
+            <div class="kpi-sub">Nilai Sisa Buku Bersih</div>
+        </div>
+    </div>
+
+    <!-- TABS & FILTER -->
+    <div class="nav-and-filter">
+        <div class="tab-bar">
+            <div class="tab-item active" id="tab1" onclick="switchTab(1)">Aset Belum Disusutkan (Bulan Berjalan)</div>
+            <div class="tab-item" id="tab2" onclick="switchTab(2)">Riwayat Jurnal Penyusutan</div>
+        </div>
+
+        <div class="filter-box">
+            <!-- Filter Tab 1 -->
+            <div id="filterTab1" style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                <div class="form-group">
+                    <label>Bulan/Tahun:</label>
+                    <select id="selBulan">
+                        <option value="01">Januari</option>
+                        <option value="02">Februari</option>
+                        <option value="03">Maret</option>
+                        <option value="04">April</option>
+                        <option value="05">Mei</option>
+                        <option value="06">Juni</option>
+                        <option value="07">Juli</option>
+                        <option value="08">Agustus</option>
+                        <option value="09">September</option>
+                        <option value="10">Oktober</option>
+                        <option value="11">November</option>
+                        <option value="12">Desember</option>
+                    </select>
+                    <input type="number" id="inpTahun" value="2026" style="width:75px;">
+                </div>
+
+                <div class="form-group">
+                    <label>Kategori:</label>
+                    <select id="selKategori">
+                        <option value="Semua">Semua Kategori</option>
+                        <option value="BGN">BGN - Bangunan (40 Thn)</option>
+                        <option value="KL1">KL1 - Golongan 1 (8 Thn)</option>
+                        <option value="KL2">KL2 - Golongan 2 (16 Thn)</option>
+                        <option value="TNH">TNH - Tanah (0 Thn)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Status Sinkron:</label>
+                    <select id="selSinkron">
+                        <option value="Semua">Semua Data</option>
+                        <option value="Diff">Hanya Tdk Sinkron (Tgl != Thn)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Pencarian:</label>
+                    <input type="text" id="inpCari" placeholder="No.Inv / Nama / Ruang..." style="width:180px;">
+                </div>
+
+                <button class="btn btn-primary btn-sm" onclick="muatDataBelumSusut()">Tampilkan</button>
+            </div>
+
+            <!-- Filter Tab 2 -->
+            <div id="filterTab2" style="display:none; align-items:center; gap:10px; flex-wrap:wrap;">
+                <div class="form-group">
+                    <label>Periode:</label>
+                    <input type="date" id="tglAwalRiwayat">
+                    <span>s.d.</span>
+                    <input type="date" id="tglAkhirRiwayat">
+                </div>
+                <div class="form-group">
+                    <label>Cari:</label>
+                    <input type="text" id="inpCariRiwayat" placeholder="No.Susut / Nama..." style="width:180px;">
+                </div>
+                <button class="btn btn-primary btn-sm" onclick="muatRiwayatPenyusutan()">Tampilkan Riwayat</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONTENT AREA -->
+    <div class="content-area">
+        <!-- TABEL 1: BELUM SUSUT -->
+        <div class="table-wrap" id="wrapTab1">
+            <table id="tableBelumSusut">
+                <thead>
+                    <tr>
+                        <th style="width:35px;" class="text-center"><input type="checkbox" id="checkAll" onchange="toggleCheckAll(this)"></th>
+                        <th style="width:110px;">No. Inventaris</th>
+                        <th style="width:90px;">Kode</th>
+                        <th>Nama Barang / Aset</th>
+                        <th>Kategori</th>
+                        <th>Ruang</th>
+                        <th style="width:95px;">Tgl Pengadaan</th>
+                        <th style="width:85px;">Thn Produksi</th>
+                        <th class="text-right">Harga Perolehan</th>
+                        <th class="text-center">Bulan</th>
+                        <th class="text-right">Beban/Bulan</th>
+                        <th class="text-right">Akum. Susut</th>
+                        <th class="text-right">Nilai Buku</th>
+                        <th class="text-center" style="width:80px;">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="tbodyBelumSusut">
+                    <tr><td colspan="14" class="text-center" style="padding:40px; color:#94a3b8;">Klik "Tampilkan" untuk memuat data aset yang dapat disusutkan.</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- TABEL 2: RIWAYAT SUSUT -->
+        <div class="table-wrap" id="wrapTab2" style="display:none;">
+            <table id="tableRiwayat">
+                <thead>
+                    <tr>
+                        <th style="width:130px;">No. Penyusutan</th>
+                        <th style="width:95px;">Tgl Susut</th>
+                        <th style="width:110px;">No. Inventaris</th>
+                        <th>Nama Barang</th>
+                        <th>Kategori</th>
+                        <th class="text-right">Nilai Aset</th>
+                        <th class="text-right">Beban Susut</th>
+                        <th class="text-right">Total Akumulasi</th>
+                        <th class="text-right">Nilai Buku</th>
+                        <th>Petugas</th>
+                        <th class="text-center">Status</th>
+                    </tr>
+                </thead>
+                <tbody id="tbodyRiwayat">
+                    <tr><td colspan="11" class="text-center" style="padding:40px; color:#94a3b8;">Belum ada riwayat ditampilkan.</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- BOTTOM ACTIONS (TAB 1 ONLY) -->
+        <div class="bottom-bar" id="bottomBarTab1">
+            <div style="font-weight:600; color:var(--text-muted);">
+                Terpilih: <span id="lblTerpilihCount" style="color:var(--primary); font-weight:700;">0</span> item | Total Beban Susut: <span id="lblTerpilihNominal" style="color:var(--danger); font-weight:700;">Rp 0</span>
+            </div>
+            <div style="display:flex; gap:8px;">
+                <button class="btn btn-success" onclick="postingJurnalPenyusutan()">Posting Jurnal Penyusutan Terpilih</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL EDIT MASTER ASET -->
+    <div class="modal-overlay" id="modalEditMaster">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3>Koreksi Master Data Aset</h3>
+                <span style="cursor:pointer; font-weight:700; color:#94a3b8;" onclick="tutupModalMaster()">x</span>
+            </div>
+            <div class="modal-body">
+                <div class="alert-box">
+                    Koreksi <b>Tanggal Pengadaan</b> dan <b>Tahun Produksi</b> agar sinkron. Perubahan akan langsung disimpan ke master aset (<code>inventaris</code> & <code>inventaris_barang</code>) dan menghitung ulang depresiasi.
+                </div>
+                <div class="form-field">
+                    <label>No. Inventaris</label>
+                    <input type="text" id="mNoInventaris" readonly style="background:#e2e8f0; font-weight:700;">
+                </div>
+                <div class="form-field">
+                    <label>Kode & Nama Barang</label>
+                    <input type="text" id="mNamaBarang" readonly style="background:#e2e8f0;">
+                    <input type="hidden" id="mKodeBarang">
+                </div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                    <div class="form-field">
+                        <label>Tanggal Pengadaan</label>
+                        <input type="date" id="mTglPengadaan" onchange="sinkronkanTahunOtomatis(this.value)">
+                    </div>
+                    <div class="form-field">
+                        <label>Tahun Produksi</label>
+                        <input type="number" id="mThnProduksi" min="1950" max="2100">
+                    </div>
+                </div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                    <div class="form-field">
+                        <label>Harga Perolehan (Rp)</label>
+                        <input type="number" id="mHarga" min="0">
+                    </div>
+                    <div class="form-field">
+                        <label>Kategori Aset</label>
+                        <select id="mIdKategori">
+                            <option value="BGN">BGN - Bangunan (40 Thn)</option>
+                            <option value="KL1">KL1 - Golongan 1 (8 Thn)</option>
+                            <option value="KL2">KL2 - Golongan 2 (16 Thn)</option>
+                            <option value="TNH">TNH - Tanah (0 Thn)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="tutupModalMaster()">Batal</button>
+                <button class="btn btn-primary" onclick="simpanMasterAset()">Simpan & Perbarui</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPT LOGIC -->
+    <script>
+        var currentTab = 1;
+        var rawDataAset = [];
+        var filteredDataAset = [];
+
+        function init() {
+            var now = new Date();
+            var bulanStr = (now.getMonth() + 1).toString().padStart(2, '0');
+            document.getElementById('selBulan').value = bulanStr;
+            document.getElementById('inpTahun').value = now.getFullYear();
+
+            // Init tanggal riwayat
+            var todayStr = now.toISOString().slice(0, 10);
+            var firstDay = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().slice(0, 10);
+            document.getElementById('tglAwalRiwayat').value = firstDay;
+            document.getElementById('tglAkhirRiwayat').value = todayStr;
+
+            // Auto load
+            muatDataBelumSusut();
+        }
+
+        function switchTab(tabIndex) {
+            currentTab = tabIndex;
+            document.getElementById('tab1').className = tabIndex === 1 ? 'tab-item active' : 'tab-item';
+            document.getElementById('tab2').className = tabIndex === 2 ? 'tab-item active' : 'tab-item';
+            document.getElementById('wrapTab1').style.display = tabIndex === 1 ? 'block' : 'none';
+            document.getElementById('wrapTab2').style.display = tabIndex === 2 ? 'block' : 'none';
+            document.getElementById('filterTab1').style.display = tabIndex === 1 ? 'flex' : 'none';
+            document.getElementById('filterTab2').style.display = tabIndex === 2 ? 'flex' : 'none';
+            document.getElementById('bottomBarTab1').style.display = tabIndex === 1 ? 'flex' : 'none';
+
+            if (tabIndex === 2) {
+                muatRiwayatPenyusutan();
+            }
+        }
+
+        function formatRupiah(num) {
+            return 'Rp ' + (Math.round(num) || 0).toLocaleString('id-ID');
+        }
+
+        function muatDataBelumSusut() {
+            var bulan = document.getElementById('selBulan').value;
+            var tahun = document.getElementById('inpTahun').value;
+            var kategori = document.getElementById('selKategori').value;
+            var keyword = document.getElementById('inpCari').value.trim();
+
+            document.getElementById('tbodyBelumSusut').innerHTML = '<tr><td colspan="14" class="text-center" style="padding:40px;">Memuat data aset dan menghitung depresiasi...</td></tr>';
+
+            if (window.javaApp && window.javaApp.loadDataAset) {
+                window.javaApp.loadDataAset(kategori, bulan, tahun, keyword);
+            }
+        }
+
+        window.terimaDataAset = function(jsonStr) {
+            try {
+                var res = JSON.parse(jsonStr);
+                rawDataAset = res.rows || [];
+                applyFilterAset();
+            } catch(e) {
+                console.error("Gagal menerima data aset:", e);
+                document.getElementById('tbodyBelumSusut').innerHTML = '<tr><td colspan="14" class="text-center" style="color:red; padding:20px;">Gagal memproses data: ' + e.message + '</td></tr>';
+            }
+        };
+
+        function applyFilterAset() {
+            var sinkronMode = document.getElementById('selSinkron').value;
+            var keyword = document.getElementById('inpCari').value.trim().toLowerCase();
+
+            filteredDataAset = rawDataAset.filter(function(item) {
+                if (sinkronMode === 'Diff') {
+                    var thnPengadaan = (item.tgl_pengadaan || '').substring(0, 4);
+                    var thnProduksi = (item.thn_produksi || '').trim();
+                    if (thnPengadaan === thnProduksi) return false;
+                }
+                if (keyword) {
+                    var match = (item.no_inventaris || '').toLowerCase().includes(keyword) ||
+                                (item.nama_barang || '').toLowerCase().includes(keyword) ||
+                                (item.kode_barang || '').toLowerCase().includes(keyword) ||
+                                (item.nama_ruang || '').toLowerCase().includes(keyword);
+                    if (!match) return false;
+                }
+                return true;
+            });
+
+            renderTableBelumSusut();
+            updateKPICards();
+        }
+
+        function renderTableBelumSusut() {
+            var tbody = document.getElementById('tbodyBelumSusut');
+            tbody.innerHTML = '';
+
+            if (filteredDataAset.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="14" class="text-center" style="padding:40px; color:#94a3b8;">Tidak ada data aset yang cocok dengan filter.</td></tr>';
+                updateSelectedSummary();
+                return;
+            }
+
+            filteredDataAset.forEach(function(row, idx) {
+                var tr = document.createElement('tr');
+                var thnPengadaan = (row.tgl_pengadaan || '').substring(0, 4);
+                var thnProduksi = (row.thn_produksi || '').trim();
+                var isDiff = thnPengadaan !== thnProduksi;
+
+                var badgeSync = isDiff 
+                    ? '<span class="badge badge-sync-diff" onclick="bukaModalMaster(' + idx + ')" title="Tahun Pengadaan (' + thnPengadaan + ') berbeda dengan Tahun Produksi (' + thnProduksi + '). Klik untuk ganti master.">Diff: ' + thnProduksi + '</span>'
+                    : '<span class="badge badge-sync-ok">' + thnProduksi + '</span>';
+
+                tr.innerHTML = 
+                    '<td class="text-center"><input type="checkbox" class="cb-aset" data-index="' + idx + '" onchange="updateSelectedSummary()" checked></td>' +
+                    '<td><b>' + row.no_inventaris + '</b></td>' +
+                    '<td>' + row.kode_barang + '</td>' +
+                    '<td>' + row.nama_barang + '</td>' +
+                    '<td>' + (row.nama_kategori || '-') + ' (' + row.umur_tahun + ' Thn)</td>' +
+                    '<td>' + (row.nama_ruang || '-') + '</td>' +
+                    '<td>' + (row.tgl_pengadaan || '-') + '</td>' +
+                    '<td>' + badgeSync + '</td>' +
+                    '<td class="text-right">' + formatRupiah(row.harga) + '</td>' +
+                    '<td class="text-center">' + row.selisih_bulan + ' / ' + row.umur_bulan + '</td>' +
+                    '<td class="text-right" style="color:var(--danger); font-weight:600;">' + formatRupiah(row.beban_susut_bulan) + '</td>' +
+                    '<td class="text-right">' + formatRupiah(row.akumulasi_susut) + '</td>' +
+                    '<td class="text-right" style="color:var(--success); font-weight:700;">' + formatRupiah(row.nilai_buku) + '</td>' +
+                    '<td class="text-center">' +
+                        '<button class="btn btn-outline btn-sm" onclick="bukaModalMaster(' + idx + ')" title="Koreksi Master Data">Edit</button>' +
+                    '</td>';
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('checkAll').checked = true;
+            updateSelectedSummary();
+        }
+
+        function updateKPICards() {
+            var totalPerolehan = 0;
+            var totalBebanSusut = 0;
+            var totalAkumulasi = 0;
+            var totalNilaiBuku = 0;
+
+            filteredDataAset.forEach(function(row) {
+                totalPerolehan += (row.harga || 0);
+                totalBebanSusut += (row.beban_susut_bulan || 0);
+                totalAkumulasi += (row.akumulasi_susut || 0);
+                totalNilaiBuku += (row.nilai_buku || 0);
+            });
+
+            document.getElementById('kpiTotalPerolehan').textContent = formatRupiah(totalPerolehan);
+            document.getElementById('kpiTotalItem').textContent = filteredDataAset.length + ' Unit Barang Terdata';
+            document.getElementById('kpiBebanBulanIni').textContent = formatRupiah(totalBebanSusut);
+            document.getElementById('kpiTotalAkumulasi').textContent = formatRupiah(totalAkumulasi);
+            document.getElementById('kpiTotalNilaiBuku').textContent = formatRupiah(totalNilaiBuku);
+        }
+
+        function toggleCheckAll(source) {
+            var checkboxes = document.querySelectorAll('.cb-aset');
+            checkboxes.forEach(function(cb) { cb.checked = source.checked; });
+            updateSelectedSummary();
+        }
+
+        function updateSelectedSummary() {
+            var checkboxes = document.querySelectorAll('.cb-aset:checked');
+            var count = checkboxes.length;
+            var totalSusut = 0;
+
+            checkboxes.forEach(function(cb) {
+                var idx = parseInt(cb.dataset.index);
+                if (filteredDataAset[idx]) {
+                    totalSusut += (filteredDataAset[idx].beban_susut_bulan || 0);
+                }
+            });
+
+            document.getElementById('lblTerpilihCount').textContent = count;
+            document.getElementById('lblTerpilihNominal').textContent = formatRupiah(totalSusut);
+        }
+
+        // --- MODAL MASTER ASET ---
+        var activeEditIndex = -1;
+
+        function bukaModalMaster(idx) {
+            var row = filteredDataAset[idx];
+            if (!row) return;
+            activeEditIndex = idx;
+
+            document.getElementById('mNoInventaris').value = row.no_inventaris || '';
+            document.getElementById('mKodeBarang').value = row.kode_barang || '';
+            document.getElementById('mNamaBarang').value = (row.kode_barang || '') + ' - ' + (row.nama_barang || '');
+            document.getElementById('mTglPengadaan').value = row.tgl_pengadaan || '';
+            document.getElementById('mThnProduksi').value = row.thn_produksi || (row.tgl_pengadaan ? row.tgl_pengadaan.substring(0, 4) : '');
+            document.getElementById('mHarga').value = row.harga || 0;
+            document.getElementById('mIdKategori').value = row.id_kategori || 'KL1';
+
+            document.getElementById('modalEditMaster').style.display = 'flex';
+        }
+
+        function sinkronkanTahunOtomatis(tglVal) {
+            if (tglVal && tglVal.length >= 4) {
+                document.getElementById('mThnProduksi').value = tglVal.substring(0, 4);
+            }
+        }
+
+        function tutupModalMaster() {
+            document.getElementById('modalEditMaster').style.display = 'none';
+            activeEditIndex = -1;
+        }
+
+        function simpanMasterAset() {
+            var noInv = document.getElementById('mNoInventaris').value;
+            var kdBrg = document.getElementById('mKodeBarang').value;
+            var tglPengadaan = document.getElementById('mTglPengadaan').value;
+            var thnProduksi = document.getElementById('mThnProduksi').value;
+            var harga = parseFloat(document.getElementById('mHarga').value) || 0;
+            var idKategori = document.getElementById('mIdKategori').value;
+
+            if (!tglPengadaan || !thnProduksi) {
+                alert('Tanggal Pengadaan dan Tahun Produksi wajib diisi!');
+                return;
+            }
+
+            var payload = {
+                no_inventaris: noInv,
+                kode_barang: kdBrg,
+                tgl_pengadaan: tglPengadaan,
+                thn_produksi: thnProduksi,
+                harga: harga,
+                id_kategori: idKategori
+            };
+
+            if (window.javaApp && window.javaApp.updateMasterAset) {
+                window.javaApp.updateMasterAset(JSON.stringify(payload));
+            } else {
+                alert('Terhubung lokal: Master diupdate (simulasi)');
+                tutupModalMaster();
+            }
+        }
+
+        window.hasilUpdateMaster = function(sukses, pesan) {
+            if (sukses) {
+                alert('Master data aset berhasil diperbarui!');
+                tutupModalMaster();
+                muatDataBelumSusut();
+            } else {
+                alert('Gagal memperbarui master data: ' + pesan);
+            }
+        };
+
+        // --- POSTING JURNAL ---
+        function postingJurnalPenyusutan() {
+            var checkboxes = document.querySelectorAll('.cb-aset:checked');
+            if (checkboxes.length === 0) {
+                alert('Pilih minimal satu aset yang ingin diposting penyusutannya!');
+                return;
+            }
+
+            var itemsToPost = [];
+            checkboxes.forEach(function(cb) {
+                var idx = parseInt(cb.dataset.index);
+                if (filteredDataAset[idx]) {
+                    itemsToPost.push(filteredDataAset[idx]);
+                }
+            });
+
+            var bulan = document.getElementById('selBulan').value;
+            var tahun = document.getElementById('inpTahun').value;
+            var tglSusut = tahun + '-' + bulan + '-28'; // standard akhir bulan
+            var konfirmasi = confirm('Yakin ingin memposting jurnal penyusutan untuk ' + itemsToPost.length + ' aset pada periode ' + bulan + '/' + tahun + '?\n\nJurnal akan otomatis masuk ke Laba Rugi (Beban Penyusutan) dan Neraca (Akumulasi Penyusutan).');
+            if (!konfirmasi) return;
+
+            if (window.javaApp && window.javaApp.postingPenyusutan) {
+                window.javaApp.postingPenyusutan(JSON.stringify(itemsToPost), tglSusut, "Penyusutan Aset Periode " + bulan + "/" + tahun);
+            }
+        }
+
+        window.hasilPostingPenyusutan = function(sukses, pesan) {
+            if (sukses) {
+                alert('Sukses: ' + pesan);
+                muatDataBelumSusut();
+            } else {
+                alert('Peringatan / Gagal: ' + pesan);
+            }
+        };
+
+        // --- TAB 2: RIWAYAT ---
+        function muatRiwayatPenyusutan() {
+            var tglAwal = document.getElementById('tglAwalRiwayat').value;
+            var tglAkhir = document.getElementById('tglAkhirRiwayat').value;
+            var keyword = document.getElementById('inpCariRiwayat').value.trim();
+
+            document.getElementById('tbodyRiwayat').innerHTML = '<tr><td colspan="11" class="text-center" style="padding:40px;">Memuat riwayat penyusutan...</td></tr>';
+
+            if (window.javaApp && window.javaApp.loadRiwayatPenyusutan) {
+                window.javaApp.loadRiwayatPenyusutan(tglAwal, tglAkhir, keyword);
+            }
+        }
+
+        window.terimaRiwayatPenyusutan = function(jsonStr) {
+            try {
+                var res = JSON.parse(jsonStr);
+                var rows = res.rows || [];
+                var tbody = document.getElementById('tbodyRiwayat');
+                tbody.innerHTML = '';
+
+                if (rows.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="11" class="text-center" style="padding:40px; color:#94a3b8;">Tidak ada data riwayat penyusutan pada periode ini.</td></tr>';
+                    return;
+                }
+
+                rows.forEach(function(r) {
+                    var tr = document.createElement('tr');
+                    tr.innerHTML = 
+                        '<td><b>' + r.no_penyusutan + '</b></td>' +
+                        '<td>' + r.tgl_penyusutan + '</td>' +
+                        '<td>' + r.no_inventaris + '</td>' +
+                        '<td>' + r.nama_barang + '</td>' +
+                        '<td>' + (r.nama_kategori || '-') + '</td>' +
+                        '<td class="text-right">' + formatRupiah(r.nilai_aset_awal) + '</td>' +
+                        '<td class="text-right" style="color:var(--danger); font-weight:600;">' + formatRupiah(r.nilai_susut_bulan) + '</td>' +
+                        '<td class="text-right">' + formatRupiah(r.nilai_susut_total) + '</td>' +
+                        '<td class="text-right" style="color:var(--success); font-weight:700;">' + formatRupiah(r.nilai_buku) + '</td>' +
+                        '<td>' + (r.petugas_nama || r.kd_petugas) + '</td>' +
+                        '<td class="text-center"><span class="badge badge-processed">Tercatat</span></td>';
+                    tbody.appendChild(tr);
+                });
+            } catch(e) {
+                console.error("Gagal menerima riwayat:", e);
+            }
+        };
+
+        // --- NAVIGASI ---
+        function bukaLabaRugi() {
+            if (window.javaApp && window.javaApp.bukaLabaRugi) window.javaApp.bukaLabaRugi();
+        }
+
+        function bukaNeracaSaldo() {
+            if (window.javaApp && window.javaApp.bukaNeracaSaldo) window.javaApp.bukaNeracaSaldo();
+        }
+
+        function keluarForm() {
+            if (window.javaApp && window.javaApp.keluarForm) window.javaApp.keluarForm();
+            else window.close();
+        }
+
+        // Listener filter change
+        document.getElementById('selSinkron').addEventListener('change', applyFilterAset);
+        document.getElementById('inpCari').addEventListener('keyup', function(e) {
+            if (e.key === 'Enter') applyFilterAset();
+        });
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    </script>
+</body>
+</html>

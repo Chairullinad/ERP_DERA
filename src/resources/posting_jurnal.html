@@ -1,0 +1,1895 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Posting &amp; Validasi Jurnal</title>
+<style>
+/* ============================================================
+   TOKEN DESAIN (CSS Custom Properties)
+   Semua warna, ukuran, jarak, dan radius didefinisikan di sini.
+   Tidak ada kode warna tertulis langsung di aturan CSS lain.
+   ============================================================ */
+:root {
+  --color-primary: #577d7f;
+  --color-primary-dark: #466769;
+  --color-primary-light: #dde7e7;
+  --color-primary-bg: #eef3f3;
+  --color-body-bg: #f0f4f4;
+  --color-panel-bg: #ffffff;
+  --color-border: #d1d5db;
+  --color-border-light: #e5e7eb;
+  --color-text-main: #333333;
+  --color-text-muted: #6b7280;
+  --color-text-label: #4b5563;
+
+  --color-btn-primary-bg: #007bff;
+  --color-btn-primary-hover: #0069d9;
+  --color-btn-sec-border: #577d7f;
+  --color-btn-sec-text: #577d7f;
+  --color-btn-sec-hover-bg: #f0f4f4;
+  --color-btn-danger-bg: #e74c3c;
+  --color-btn-danger-hover: #c0392b;
+  --color-btn-success-bg: #198754;
+  --color-btn-success-hover: #157347;
+  --color-btn-info-border: #0284c7;
+  --color-btn-info-text: #0284c7;
+  --color-btn-disabled-bg: #cbd5e1;
+  --color-btn-disabled-text: #64748b;
+
+  --color-debit: #2563eb;
+  --color-kredit: #dc2626;
+  --color-balanced: #16a34a;
+  --color-batal-bg: #fff7ed;
+  --color-batal-text: #9a3412;
+
+  --badge-draft-bg: #ffedd5;
+  --badge-draft-text: #9a3412;
+  --badge-valid-bg: #dcfce7;
+  --badge-valid-text: #166534;
+  --badge-posted-bg: #dbeafe;
+  --badge-posted-text: #1e40af;
+  --badge-batal-bg: #fee2e2;
+  --badge-batal-text: #991b1b;
+
+  --banner-kw-bg: #ecfdf5;
+  --banner-kw-border: #a7f3d0;
+  --banner-kw-text: #065f46;
+  --banner-kw-warn-bg: #fef2f2;
+  --banner-kw-warn-border: #fecaca;
+  --banner-kw-warn-text: #991b1b;
+
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-full: 10px;
+
+  --font-family: 'Segoe UI', Tahoma, Verdana, sans-serif;
+  --font-size-base: 13px;
+  --font-size-sm: 11px;
+  --font-size-xs: 10px;
+  --font-size-md: 14px;
+  --font-size-lg: 15px;
+  --font-size-xl: 16px;
+}
+
+/* ============================================================
+   GAYA UTAMA DENGAN VARIABEL TOKEN DESAIN
+   ============================================================ */
+* { box-sizing: border-box; }
+html, body { height: 100%; overflow: hidden; }
+body {
+  margin: 0;
+  padding: 10px;
+  background: var(--color-body-bg);
+  color: var(--color-text-main);
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+}
+
+.panel {
+  background: var(--color-panel-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 8px 14px;
+  margin-bottom: 6px;
+}
+
+.header-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.title {
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.user-info {
+  margin-left: 14px;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.fg {
+  display: inline-block;
+  margin: 0 10px 4px 0;
+  vertical-align: middle;
+}
+
+label {
+  font-weight: 600;
+  color: var(--color-text-label);
+  margin-right: 4px;
+  font-size: var(--font-size-sm);
+}
+
+input[type=text], input[type=date], select {
+  padding: 4px 8px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-base);
+  background: var(--color-panel-bg);
+  color: var(--color-text-main);
+  font-family: var(--font-family);
+  outline: none;
+}
+
+input[type=text]:focus, input[type=date]:focus, select:focus {
+  border-color: var(--color-primary);
+}
+
+button {
+  background: var(--color-btn-primary-bg);
+  color: #ffffff;
+  border: 0;
+  padding: 5px 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  font-family: var(--font-family);
+  transition: background 0.15s, opacity 0.15s;
+}
+
+button:hover { background: var(--color-btn-primary-hover); }
+
+button.sec {
+  background: var(--color-panel-bg);
+  color: var(--color-btn-sec-text);
+  border: 1px solid var(--color-btn-sec-border);
+}
+
+button.sec:hover { background: var(--color-btn-sec-hover-bg); }
+
+button.x {
+  background: var(--color-btn-danger-bg);
+}
+
+button.x:hover { background: var(--color-btn-danger-hover); }
+
+button.success {
+  background: var(--color-btn-success-bg);
+}
+
+button.success:hover { background: var(--color-btn-success-hover); }
+
+button:disabled {
+  background: var(--color-btn-disabled-bg) !important;
+  color: var(--color-btn-disabled-text) !important;
+  border-color: var(--color-border) !important;
+  cursor: default !important;
+  opacity: 0.7;
+}
+
+.tabs {
+  border-bottom: 2px solid var(--color-primary);
+}
+
+.tab {
+  display: inline-block;
+  padding: 7px 16px;
+  background: var(--color-primary-light);
+  color: var(--color-text-label);
+  font-weight: 600;
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+  margin-right: 3px;
+  user-select: none;
+}
+
+.tab.on {
+  background: var(--color-primary);
+  color: #ffffff;
+}
+
+.wrap {
+  background: var(--color-panel-bg);
+  border: 1px solid var(--color-border);
+  border-top: 0;
+  overflow: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+th, td {
+  padding: 6px 10px;
+  border: 1px solid var(--color-border-light);
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--font-size-base);
+}
+
+th {
+  background: var(--color-primary);
+  color: #ffffff;
+  position: relative;
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  font-weight: 600;
+}
+
+.resizer {
+  width: 5px;
+  height: 100%;
+  position: absolute;
+  right: 0;
+  top: 0;
+  cursor: col-resize;
+  user-select: none;
+}
+
+.resizer:hover {
+  background: rgba(255, 255, 255, 0.45);
+}
+
+tr.grp td {
+  background: var(--color-primary-bg);
+  font-weight: 700;
+  white-space: normal;
+}
+
+td.n, th.n { text-align: right; }
+td.c, th.c { text-align: center; }
+td.in { padding-left: 28px; }
+
+tr.bt td {
+  color: var(--color-batal-text);
+  background: var(--color-batal-bg);
+}
+
+.bdg {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  margin-left: 8px;
+}
+
+.b-dr { background: var(--badge-draft-bg); color: var(--badge-draft-text); }
+.b-ok { background: var(--badge-valid-bg); color: var(--badge-valid-text); }
+.b-po { background: var(--badge-posted-bg); color: var(--badge-posted-text); }
+.b-bt { background: var(--badge-batal-bg); color: var(--badge-batal-text); }
+
+.info {
+  color: var(--color-text-muted);
+  margin: 0 0 4px;
+  font-size: var(--font-size-sm);
+}
+
+.form-grid .fg { margin-bottom: 6px; }
+.in-n { width: 100%; text-align: right; }
+.in-t { width: 100%; }
+
+#bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--color-panel-bg);
+  border-top: 2px solid var(--color-border);
+  padding: 7px 16px;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.pager-box {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pager-box span {
+  font-weight: 600;
+  color: var(--color-text-label);
+  font-size: var(--font-size-sm);
+}
+
+.summary-group {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.sum {
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 22px;
+}
+
+.sum .cap {
+  display: block;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  line-height: 14px;
+}
+
+.sum .val {
+  display: block;
+  font-weight: 700;
+  font-size: var(--font-size-lg);
+  line-height: 18px;
+}
+
+.abar {
+  padding: 7px 16px;
+  border: 1px solid var(--color-border);
+  border-top: 2px solid var(--color-primary);
+  background: var(--color-panel-bg);
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.abar button {
+  margin-left: 8px;
+}
+
+#srcK {
+  display: none;
+  margin: 0;
+  padding: 6px 14px;
+  background: var(--banner-kw-bg);
+  border: 1px solid var(--banner-kw-border);
+  border-top: 0;
+  color: var(--banner-kw-text);
+  font-size: var(--font-size-sm);
+}
+
+#srcK.warn {
+  background: var(--banner-kw-warn-bg);
+  border-color: var(--banner-kw-warn-border);
+  color: var(--banner-kw-warn-text);
+}
+
+#srcK b { font-weight: 700; }
+#srcK a {
+  color: var(--color-kredit);
+  cursor: pointer;
+  margin-left: 12px;
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+/* Toast */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: #1f2937;
+  color: #ffffff;
+  padding: 8px 16px;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-base);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  transform: translateY(80px);
+  opacity: 0;
+  transition: all 0.25s;
+  z-index: 2100;
+  pointer-events: none;
+}
+.toast.show {
+  transform: translateY(0);
+  opacity: 1;
+}
+.toast.success { background: var(--color-btn-success-bg); }
+.toast.error { background: var(--color-btn-danger-bg); }
+
+/* Modal Dialog */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 2000;
+  align-items: center;
+  justify-content: center;
+}
+.modal-overlay.active { display: flex; }
+.modal-box {
+  background: var(--color-panel-bg);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-primary);
+  width: 520px;
+  max-width: 90%;
+  padding: 16px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+}
+.modal-box.modal-err {
+  border-top: 4px solid var(--color-btn-danger-bg);
+}
+.error-text {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+  padding: 10px;
+  border-radius: var(--radius-sm);
+  font-family: monospace;
+  font-size: 12px;
+  margin: 10px 0;
+  max-height: 180px;
+  overflow-y: auto;
+  word-break: break-all;
+}
+</style>
+</head>
+<body>
+
+<!-- Panel Header Aplikasi -->
+<div class="panel">
+  <div class="header-bar">
+    <div style="display:flex; align-items:center;">
+      <span class="title">Posting &amp; Validasi Jurnal</span>
+      <span class="user-info" id="lblUserInfo">Akuntan: -</span>
+    </div>
+    <div class="header-actions">
+      <button class="sec" onclick="bukaMappingCOA()" title="Buka Pengaturan Mapping COA">&#128736; Mapping COA</button>
+      <button class="sec" onclick="bukaBukuBesar()" title="Buka Buku Besar">&#128214; Buku Besar</button>
+      <button class="sec" onclick="bukaNeracaSaldo()" title="Buka Neraca Saldo">&#9878; Neraca Saldo</button>
+      <button class="sec" onclick="minApp()" title="Minimize">&#9472;</button>
+      <button class="sec" onclick="maxApp()" title="Maximize / Restore">&#9633;</button>
+      <button class="x" onclick="keluarApp()" title="Tutup Modul">Keluar &#10006;</button>
+    </div>
+  </div>
+  <div>
+    <div class="fg">
+      <label>Periode:</label>
+      <input type="date" id="t1" style="width:130px" onkeydown="if(event.key==='Enter'||event.keyCode===13) muatDataTabAktif();"> s/d <input type="date" id="t2" style="width:130px" onkeydown="if(event.key==='Enter'||event.keyCode===13) muatDataTabAktif();">
+    </div>
+    <div class="fg">
+      <button onclick="muatDataTabAktif()">TAMPILKAN</button>
+    </div>
+  </div>
+</div>
+
+<!-- Tabs Bar -->
+<div class="tabs" id="tabs"></div>
+
+<!-- ============================================================
+     TAB A: INPUT JURNAL MANUAL
+     ============================================================ -->
+<div id="paneA">
+  <div class="panel" style="border-radius:0;border-top:0;margin-bottom:0;">
+    <div class="form-grid">
+      <div class="fg"><label>No. Jurnal:</label><input type="text" id="aNoJur" style="width:150px" placeholder="JM..."> <button class="sec" onclick="generateNoJurnal()">Auto</button></div>
+      <div class="fg"><label>Tgl. Transaksi:</label><input type="date" id="aTgl" style="width:130px" onchange="onTglAChange()" oninput="onTglAChange()" onkeydown="onKeyTglA(event)"></div>
+      <div class="fg"><label>No. Bukti:</label><input type="text" id="aBukti" placeholder="No. Kwitansi / Bukti" style="width:150px" onkeydown="if(event.key==='Enter'||event.keyCode===13){if($('aKet'))$('aKet').focus();}"></div>
+      <div class="fg"><label>Jenis:</label>
+        <select id="aJenis">
+          <option value="UMUM">UMUM</option>
+          <option value="PENYESUAIAN">PENYESUAIAN</option>
+          <option value="KAS MASUK">KAS MASUK</option>
+          <option value="KAS KELUAR">KAS KELUAR</option>
+          <option value="MEMORIAL">MEMORIAL</option>
+        </select>
+      </div>
+      <div class="fg" style="margin-right:0;">
+        <label>Keterangan:</label><input type="text" id="aKet" placeholder="Keterangan transaksi jurnal..." style="width:280px" oninput="calcA()" onkeydown="if(event.key==='Enter'||event.keyCode===13){const firstKd=document.querySelector('#tbA tr[data-idx=\'0\'] .txt-kd');if(firstKd)firstKd.focus();}">
+        <button class="sec" onclick="addRowA()" title="Tambah Baris Ayat" style="margin-left:4px;">+ Tambah Baris</button>
+        <button class="sec" style="border-color:var(--color-btn-info-border);color:var(--color-btn-info-text);margin-left:2px;" onclick="bukaKwitansiAction()" title="Buka Kwitansi Kegiatan (DlgKwitansi); pilih untuk mengisi form">&#128196; Kwitansi</button>
+        <span class="info" style="margin-left:8px;">Tips: Enter pindah kolom; Ctrl+S simpan.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Banner Sumber Kwitansi -->
+  <div id="srcK"></div>
+
+  <!-- Tabel Ayat Tab A -->
+  <div class="wrap" id="wrapA">
+    <table id="tblA">
+      <thead>
+        <tr>
+          <th class="c" style="width:44px">No</th>
+          <th style="width:160px">Kode Rekening</th>
+          <th style="width:300px">Nama Rekening</th>
+          <th class="n" style="width:150px">Debet (Rp)</th>
+          <th class="n" style="width:150px">Kredit (Rp)</th>
+          <th>Catatan Baris</th>
+          <th class="c" style="width:70px">Aksi</th>
+        </tr>
+      </thead>
+      <tbody id="tbA"></tbody>
+    </table>
+  </div>
+
+  <!-- Total Bar Tab A -->
+  <div class="abar" id="barA">
+    <span class="sum"><span class="cap">Total Debet</span><span class="val" id="aD" style="color:var(--color-debit)">0</span></span>
+    <span class="sum"><span class="cap">Total Kredit</span><span class="val" id="aK" style="color:var(--color-kredit)">0</span></span>
+    <span class="sum"><span class="cap">Status</span><span class="val" id="aS">-</span></span>
+    <button class="sec" onclick="isiSelisihA()">Isi Selisih</button>
+    <button id="aSimpan" onclick="simpanJurnalA()" class="success">&#10003; SIMPAN JURNAL</button>
+  </div>
+</div>
+
+<!-- ============================================================
+     TAB B, C, D: DAFTAR TRANSAKSI & VALIDASI
+     ============================================================ -->
+<div id="paneL" style="display:none">
+  <div class="panel" style="border-radius:0;border-top:0;margin-bottom:0;" id="flt"></div>
+  <div class="wrap" id="wrapL">
+    <table id="tblL">
+      <thead id="thL"></thead>
+      <tbody id="tbL"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Panel Bawah Validasi & Paginasi (Tab B, C, D) -->
+<div id="bar" style="display:none">
+  <div class="pager-box">
+    <button class="sec" id="btnPrevL" onclick="ubahHalamanL(-1)" disabled>&laquo; Sebelumnya</button>
+    <span id="infoPagerL">Halaman 1 dari 1 (0 Transaksi)</span>
+    <button class="sec" id="btnNextL" onclick="ubahHalamanL(1)" disabled>Berikutnya &raquo;</button>
+  </div>
+  <div class="summary-group">
+    <span class="sum"><span class="cap">Item Terpilih</span><span class="val" id="sI">0 Transaksi</span></span>
+    <span class="sum"><span class="cap">Total Debit</span><span class="val" id="sD" style="color:var(--color-debit)">Rp 0</span></span>
+    <span class="sum"><span class="cap">Total Kredit</span><span class="val" id="sK" style="color:var(--color-kredit)">Rp 0</span></span>
+    <span class="sum"><span class="cap">Selisih</span><span class="val" id="sS">Rp 0</span></span>
+  </div>
+  <div>
+    <button id="bV" class="success" style="font-size:var(--font-size-md);padding:8px 16px" onclick="validasiTerpilihL()" disabled>&#10003; VALIDASI TERPILIH</button>
+  </div>
+</div>
+
+<!-- Toast Notifikasi -->
+<div class="toast" id="toast"></div>
+
+<!-- Modal Error & Konfirmasi -->
+<div class="modal-overlay" id="errorModal">
+  <div class="modal-box modal-err">
+    <h3 id="modalErrTitle" style="margin:0 0 8px; color:var(--color-btn-danger-bg); font-size:var(--font-size-md);">Kesalahan</h3>
+    <div class="error-text" id="modalErrBody"></div>
+    <div style="text-align:right; margin-top:12px;">
+      <button class="sec" onclick="salinError()">Salin Pesan</button>
+      <button class="x" onclick="tutupErrorModal()">Tutup</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// KONFIGURASI TAMPILAN
+// Titik konfigurasi teks tab, label status, kolom, dan ukuran halaman.
+// ============================================================
+const KONFIGURASI = {
+  LABEL_TAB: {
+    A: 'A  Input Jurnal',
+    B: 'B  Jurnal Manual',
+    C: 'C  Pemasukan Harian',
+    D: 'D  Pengeluaran Harian'
+  },
+  LABEL_STATUS: {
+    Semua: 'Semua Status',
+    Draft: 'Draft (Belum Validasi)',
+    Manual: 'Manual (Belum Validasi)',
+    Valid: 'Valid (Siap Posting)',
+    Posted: 'Posted'
+  },
+  KOLOM_B: [
+    { id: 'check', title: '', width: 36, align: 'center' },
+    { id: 'tgl', title: 'Tgl Jurnal', width: 85, align: 'left' },
+    { id: 'no_jurnal', title: 'No Jurnal', width: 140, align: 'left' },
+    { id: 'kd_rek', title: 'Kode COA', width: 95, align: 'left' },
+    { id: 'nm_rek', title: 'Nama COA', width: 280, align: 'left' },
+    { id: 'debet', title: 'Debit (Rp)', width: 120, align: 'right' },
+    { id: 'kredit', title: 'Kredit (Rp)', width: 120, align: 'right' },
+    { id: 'no_bukti', title: 'No Bukti', width: 160, align: 'left' },
+    { id: 'status', title: 'Status', width: 100, align: 'left' }
+  ],
+  KOLOM_C: [
+    { id: 'check', title: '', width: 36, align: 'center' },
+    { id: 'tgl', title: 'Tgl Jurnal', width: 85, align: 'left' },
+    { id: 'no_jurnal', title: 'No Jurnal', width: 140, align: 'left' },
+    { id: 'kd_rek', title: 'Kode COA', width: 95, align: 'left' },
+    { id: 'nm_rek', title: 'Nama COA', width: 280, align: 'left' },
+    { id: 'debet', title: 'Debit (Rp)', width: 120, align: 'right' },
+    { id: 'kredit', title: 'Kredit (Rp)', width: 120, align: 'right' },
+    { id: 'no_bukti', title: 'No Bukti', width: 160, align: 'left' },
+    { id: 'status', title: 'Status', width: 100, align: 'left' }
+  ],
+  KOLOM_D: [
+    { id: 'check', title: '', width: 36, align: 'center' },
+    { id: 'tgl', title: 'Tgl Jurnal', width: 85, align: 'left' },
+    { id: 'no_jurnal', title: 'No Jurnal', width: 140, align: 'left' },
+    { id: 'kd_rek', title: 'Kode COA', width: 95, align: 'left' },
+    { id: 'nm_rek', title: 'Nama COA', width: 280, align: 'left' },
+    { id: 'debet', title: 'Debit (Rp)', width: 120, align: 'right' },
+    { id: 'kredit', title: 'Kredit (Rp)', width: 120, align: 'right' },
+    { id: 'no_bukti', title: 'No Bukti', width: 160, align: 'left' },
+    { id: 'status', title: 'Status', width: 100, align: 'left' }
+  ],
+  UKURAN_HALAMAN: {
+    manual: 200,
+    sumber: 250
+  }
+};
+
+// ============================================================
+// STATE GLOBAL
+// ============================================================
+let TAB_AKTIF = 'A';
+let rowsA = [
+  ['', '', 0, 0, ''],
+  ['', '', 0, 0, '']
+];
+let activeRowKeyA = null;
+
+// State Tab B, C, D
+let DATA_LIST = { B: [], C: [], D: [] };
+let SEL = {}; // Key: id transaksi -> boolean
+let PAGING = {
+  B: { page: 1, pageSize: KONFIGURASI.UKURAN_HALAMAN.manual, totalPages: 1, totalItems: 0, hasMore: false },
+  C: { page: 1, pageSize: KONFIGURASI.UKURAN_HALAMAN.sumber, totalPages: 1, totalItems: 0 },
+  D: { page: 1, pageSize: KONFIGURASI.UKURAN_HALAMAN.sumber, totalPages: 1, totalItems: 0 }
+};
+let LOADED_TAB = { A: true, B: false, C: false, D: false };
+
+// Helper DOM & Format
+function $(id) { return document.getElementById(id); }
+
+function esc(str) {
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function rp(num) {
+  const n = Math.round((parseFloat(num) || 0) * 100) / 100;
+  const neg = n < 0;
+  const abs = neg ? -n : n;
+  const parts = String(abs).split('.');
+  const intPart = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  return (neg ? '-' : '') + (parts.length > 1 ? intPart + ',' + parts[1] : intPart);
+}
+
+function todayStr() {
+  const d = new Date();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  return `${d.getFullYear()}-${m}-${dd}`;
+}
+
+// Badge status
+function bdg(st) {
+  const map = {
+    Draft: 'b-dr',
+    Manual: 'b-dr',
+    Valid: 'b-ok',
+    Posted: 'b-po'
+  };
+  const cls = map[st] || 'b-dr';
+  return '<span class="bdg ' + cls + '">' + esc(st) + '</span>';
+}
+
+// Bridge callbacks kompatibilitas dengan Java
+function onTglAChange() {
+  generateNoJurnal();
+  calcA();
+}
+
+function onKeyTglA(e) {
+  if (e.key === 'Enter' || e.keyCode === 13) {
+    if (e.preventDefault) e.preventDefault();
+    onTglAChange();
+    if ($('aBukti')) $('aBukti').focus();
+  }
+}
+
+window.terimaHasilSimpan = function(sukses, pesan, noJurnal) {
+  isSavingA = false;
+  if ($('aSimpan')) {
+    $('aSimpan').disabled = false;
+    $('aSimpan').innerHTML = '&#10003; SIMPAN JURNAL';
+  }
+  if (sukses) {
+    showToast(pesan || 'Jurnal berhasil disimpan sebagai draft.', 'success');
+    
+    // Invalidate cache Tab B agar saat dibuka Tab B selalu mengambil data terbaru dari database
+    LOADED_TAB.B = false;
+
+    // Perluas filter tanggal jika tanggal jurnal di luar t1..t2
+    const tglForm = $('aTgl') ? $('aTgl').value : '';
+    if (tglForm) {
+      if ($('t1') && $('t1').value > tglForm) $('t1').value = tglForm;
+      if ($('t2') && $('t2').value < tglForm) $('t2').value = tglForm;
+    }
+
+    resetFormAndRefresh();
+    if (TAB_AKTIF === 'B') muatDataTabAktif();
+  } else {
+    showAppError('Gagal Menyimpan Jurnal', pesan);
+    calcA();
+  }
+};
+
+window.terimaHasilHapusJurnal = function(sukses, pesan, count) {
+  if (sukses) {
+    showToast('Berhasil menghapus ' + count + ' jurnal.', 'success');
+    muatDataTabAktif();
+  } else {
+    showAppError('Gagal Menghapus Jurnal', pesan);
+  }
+};
+
+window.terimaJurnalCopy = function(jsonStr) {
+  try {
+    const data = typeof jsonStr === 'string' ? JSON.parse(jsonStr) : jsonStr;
+    if (data.no_bukti) $('aBukti').value = data.no_bukti;
+    if (data.keterangan) $('aKet').value = data.keterangan;
+    if (data.details && data.details.length > 0) {
+      rowsA = data.details.map(d => [d.kd_rek || '', d.nm_rek || '', d.debet || 0, d.kredit || 0, d.keterangan || '']);
+      renderA();
+    }
+  } catch(e) {
+    console.error('Error terimaJurnalCopy:', e);
+  }
+};
+
+window.setManualLoadingState = function(isLoading) {};
+window.switchTab = function(t) {
+  if (t === 'draft' || t === 'manual') showTab('B');
+  else if (t === 'input') showTab('A');
+};
+window.loadTransaksiDraft = function() {
+  if (TAB_AKTIF === 'B') muatDataTabAktif();
+};
+
+// ============================================================
+// === DESAIN: TEMPLAT RENDER TERPISAH DARI LOGIKA DATA ===
+// ============================================================
+
+// === DESAIN: Kepala Grup Transaksi (Baris Induk) ===
+function htmlKepalaGrup(g, tab, isChecked, isPickable) {
+  const checkAttr = isPickable
+    ? 'onclick="pickL(\'' + g.id + '\', this.checked)"' + (isChecked ? ' checked' : '')
+    : 'disabled checked title="Sudah ' + g.st + '"';
+
+  return '<tr class="grp">' +
+    '<td class="c"><input type="checkbox" ' + checkAttr + ' data-id="' + g.id + '"></td>' +
+    '<td colspan="4">' + g.head + bdg(g.st) + (g.bt ? '<span class="bdg b-bt">ADA PEMBATALAN</span>' : '') + '</td>' +
+    '<td class="n">' + rp(g.totalDebet) + '</td>' +
+    '<td class="n">' + rp(g.totalKredit) + '</td>' +
+    '<td colspan="2"></td>' +
+    '</tr>';
+}
+
+// === DESAIN: Baris Ayat Jurnal (Baris Rincian) ===
+function htmlBarisAyat(l, tab, g) {
+  const isBatal = l.is_batal || /PEMBATALAN/i.test(l.nm_rek) || /PEMBATALAN/i.test(l.keterangan || '');
+  const rowClass = isBatal ? ' class="bt"' : '';
+  const indentClass = (parseFloat(l.kredit) || 0) > 0 ? ' class="in"' : '';
+
+  return '<tr' + rowClass + '>' +
+    '<td></td>' +
+    '<td>' + esc(l.tgl) + '</td>' +
+    '<td>' + esc(l.no_jurnal) + '</td>' +
+    '<td>' + esc(l.kd_rek) + '</td>' +
+    '<td' + indentClass + '>' + esc(l.nm_rek) + '</td>' +
+    '<td class="n">' + (parseFloat(l.debet) > 0 ? rp(l.debet) : '') + '</td>' +
+    '<td class="n">' + (parseFloat(l.kredit) > 0 ? rp(l.kredit) : '') + '</td>' +
+    '<td>' + esc(l.no_bukti) + '</td>' +
+    '<td>' + esc(l.status) + '</td>' +
+    '</tr>';
+}
+
+// === DESAIN: Filter Bar (Tab B, C, D) ===
+function htmlFilter(tab) {
+  let s = '<div class="fg"><label>Status:</label><select id="fltStatus" onchange="muatDataTabAktif()" onkeydown="if(event.key===\'Enter\'||event.keyCode===13) muatDataTabAktif();">';
+  s += '<option value="Semua">' + KONFIGURASI.LABEL_STATUS.Semua + '</option>';
+  s += '<option value="Draft">' + (tab === 'B' ? KONFIGURASI.LABEL_STATUS.Manual : KONFIGURASI.LABEL_STATUS.Draft) + '</option>';
+  s += '<option value="Valid">' + KONFIGURASI.LABEL_STATUS.Valid + '</option>';
+  s += '<option value="Posted">' + KONFIGURASI.LABEL_STATUS.Posted + '</option>';
+  s += '</select></div>';
+
+  if (tab === 'C') {
+    s += '<div class="fg"><label>Kategori Pemasukan:</label><select id="fltKategori" onchange="muatDataTabAktif()" onkeydown="if(event.key===\'Enter\'||event.keyCode===13) muatDataTabAktif();">' +
+      '<option value="Semua">Semua Kategori</option>' +
+      '</select></div>';
+    s += '<div class="fg"><label>Akun Bayar:</label><select id="fltAkunBayar" onchange="muatDataTabAktif()" onkeydown="if(event.key===\'Enter\'||event.keyCode===13) muatDataTabAktif();">' +
+      '<option value="Semua">Semua Akun Bayar</option>' +
+      '</select></div>';
+  } else if (tab === 'D') {
+    s += '<div class="fg"><label>Kategori Pengeluaran:</label><select id="fltKategori" onchange="muatDataTabAktif()" onkeydown="if(event.key===\'Enter\'||event.keyCode===13) muatDataTabAktif();">' +
+      '<option value="Semua">Semua Kategori</option>' +
+      '</select></div>';
+  }
+
+  s += '<div class="fg"><label>Kata Kunci:</label><input type="text" id="fltKeyword" placeholder="No. bukti / keterangan / akun..." style="width:220px" onkeydown="if(event.key===\'Enter\'||event.keyCode===13) muatDataTabAktif();"></div>';
+  s += '<div class="fg"><button onclick="muatDataTabAktif()">CARI</button></div>';
+
+  if (tab !== 'B') {
+    const sumberNama = tab === 'C' ? 'Pemasukan Lain' : 'Pengeluaran Harian';
+    s += '<p class="info" style="margin:2px 0 0">Hasil jurnal dari ' + sumberNama + ' (jurnal inti). Pembatalan tampil sebagai jurnal pembalik dalam transaksi yang sama.</p>';
+  }
+
+  return s;
+}
+
+// === DESAIN: Total Bar Validasi Bawah ===
+function htmlBarTotal(n, d, k, bad) {
+  $('sI').innerHTML = n + ' Transaksi';
+  $('sD').innerHTML = 'Rp ' + rp(d);
+  $('sK').innerHTML = 'Rp ' + rp(k);
+
+  const selisihSen = Math.round(d * 100) - Math.round(k * 100);
+  if (!n) {
+    $('sS').innerHTML = 'Rp 0';
+    $('sS').style.color = 'var(--color-text-main)';
+  } else if (bad > 0 || selisihSen !== 0) {
+    $('sS').innerHTML = 'TIDAK BALANCE';
+    $('sS').style.color = 'var(--color-kredit)';
+  } else {
+    $('sS').innerHTML = 'Rp 0 (Balance)';
+    $('sS').style.color = 'var(--color-balanced)';
+  }
+
+  $('bV').disabled = (!n || bad > 0 || selisihSen !== 0);
+}
+
+// ============================================================
+// MANAJEMEN TAB & RESPONSIVE FIT
+// ============================================================
+function renderTabsNav() {
+  const h = [];
+  for (const k in KONFIGURASI.LABEL_TAB) {
+    h.push('<span class="tab' + (k === TAB_AKTIF ? ' on' : '') + '" onclick="showTab(\'' + k + '\')">' + KONFIGURASI.LABEL_TAB[k] + '</span>');
+  }
+  $('tabs').innerHTML = h.join('');
+}
+
+function fit() {
+  const isA = TAB_AKTIF === 'A';
+  const el = isA ? $('wrapA') : $('wrapL');
+  if (!el) return;
+  const barEl = isA ? $('barA') : $('bar');
+  const barH = barEl ? barEl.offsetHeight : 0;
+  const top = el.getBoundingClientRect().top;
+  const avail = window.innerHeight - top - barH - 10;
+  el.style.height = Math.max(120, avail) + 'px';
+}
+window.onresize = fit;
+
+function showTab(t) {
+  // Cek apakah ada yang terpilih sebelum pindah tab
+  let countSelected = 0;
+  for (const k in SEL) {
+    if (SEL[k]) countSelected++;
+  }
+  if (countSelected > 0 && t !== TAB_AKTIF) {
+    if (!confirm('Ada ' + countSelected + ' transaksi terpilih di tab ini. Pilihan akan direset jika Anda berpindah tab. Lanjutkan?')) {
+      return;
+    }
+  }
+
+  TAB_AKTIF = t;
+  SEL = {};
+
+  $('paneA').style.display = (t === 'A') ? 'block' : 'none';
+  $('paneL').style.display = (t === 'A') ? 'none' : 'block';
+  $('bar').style.display = (t === 'A') ? 'none' : 'flex';
+
+  renderTabsNav();
+
+  if (t === 'A') {
+    renderA();
+    calcA();
+  } else {
+    $('flt').innerHTML = htmlFilter(t);
+    renderHeaderTabelL(t);
+    if (t === 'B' || !LOADED_TAB[t]) {
+      muatDataTabAktif();
+    } else {
+      renderL();
+    }
+  }
+  fit();
+}
+
+function renderHeaderTabelL(tab) {
+  const cols = KONFIGURASI['KOLOM_' + tab] || KONFIGURASI.KOLOM_B;
+  let h = '<tr>';
+  cols.forEach((c, idx) => {
+    const alignCls = c.align === 'center' ? ' class="c"' : (c.align === 'right' ? ' class="n"' : '');
+    const w = c.width ? ' style="width:' + c.width + 'px"' : '';
+    if (idx === 0) {
+      h += '<th class="c"' + w + '><input type="checkbox" id="all" onclick="toggleAllL(this.checked)"></th>';
+    } else {
+      h += '<th' + alignCls + w + '>' + esc(c.title) + '</th>';
+    }
+  });
+  h += '</tr>';
+  $('thL').innerHTML = h;
+  initResizable('wrapL');
+}
+
+// ============================================================
+// TAB A: LOGIKA INPUT JURNAL
+// ============================================================
+function renderA() {
+  const h = [];
+  for (let i = 0; i < rowsA.length; i++) {
+    const r = rowsA[i];
+    h.push('<tr data-idx="' + i + '">' +
+      '<td class="c">' + (i + 1) + '</td>' +
+      '<td>' +
+        '<div style="display:flex; align-items:center;">' +
+          '<input class="in-t txt-kd" type="text" value="' + esc(r[0]) + '" onchange="setKodeA(' + i + ', this.value)" onkeydown="onKeyCellA(event, ' + i + ', 0)" placeholder="Kode COA" style="flex:1; min-width:0;">' +
+          '<button type="button" class="sec" style="margin-left:4px; padding:2px 7px; font-size:11px; font-weight:700; height:24px; line-height:1; cursor:pointer; white-space:nowrap;" onclick="bukaCariRekeningDialog(' + i + ')" title="Cari Akun COA">COA</button>' +
+        '</div>' +
+      '</td>' +
+      '<td><span class="lbl-nm" style="' + (!r[1] ? 'color:var(--color-text-muted);font-style:italic;' : '') + '">' + (esc(r[1]) || '(pilih akun)') + '</span></td>' +
+      '<td><input class="in-n txt-deb" type="text" value="' + (r[2] > 0 ? rp(r[2]) : '') + '" onchange="updA(' + i + ', 2, this.value)" onkeydown="onKeyCellA(event, ' + i + ', 2)" placeholder="0"></td>' +
+      '<td><input class="in-n txt-kre" type="text" value="' + (r[3] > 0 ? rp(r[3]) : '') + '" onchange="updA(' + i + ', 3, this.value)" onkeydown="onKeyCellA(event, ' + i + ', 3)" placeholder="0"></td>' +
+      '<td><input class="in-t txt-ket" type="text" value="' + esc(r[4] || '') + '" onchange="rowsA[' + i + '][4]=this.value" onkeydown="onKeyCellA(event, ' + i + ', 4)" placeholder="Catatan per baris..."></td>' +
+      '<td class="c"><button class="sec" style="padding:2px 8px; color:var(--color-btn-danger-bg); border-color:var(--color-border);" onclick="hapusBarisA(' + i + ')" title="Hapus Baris">&#10006;</button></td>' +
+      '</tr>');
+  }
+  $('tbA').innerHTML = h.join('');
+  calcA();
+}
+
+function addRowA() {
+  rowsA.push(['', '', 0, 0, '']);
+  renderA();
+  // Focus ke kode baris baru
+  setTimeout(() => {
+    const inputs = document.querySelectorAll('#tbA .txt-kd');
+    if (inputs.length > 0) inputs[inputs.length - 1].focus();
+  }, 50);
+}
+
+function hapusBarisA(idx) {
+  if (rowsA.length <= 2) {
+    showToast('Minimal jurnal terdiri dari 2 baris.', 'error');
+    return;
+  }
+  rowsA.splice(idx, 1);
+  renderA();
+}
+
+function updA(idx, col, val) {
+  const clean = String(val).replace(/\./g, '').replace(/,/g, '.');
+  rowsA[idx][col] = parseFloat(clean) || 0;
+  // Jika isi debet, kosongkan kredit pada baris yg sama dan sebaliknya
+  if (col === 2 && rowsA[idx][2] > 0) rowsA[idx][3] = 0;
+  if (col === 3 && rowsA[idx][3] > 0) rowsA[idx][2] = 0;
+  renderA();
+}
+
+function setKodeA(idx, val) {
+  const kd = String(val).trim();
+  rowsA[idx][0] = kd;
+  if (!kd) {
+    rowsA[idx][1] = '';
+    renderA();
+    return;
+  }
+  // Lookup via java bridge jika ada
+  if (window.javaApp && typeof javaApp.cariRekening === 'function') {
+    javaApp.cariRekening(kd, String(idx));
+  }
+}
+
+// Callback dari Java bridge cariRekening
+window.setNamaRekening = function(rowKey, kdRek, nmRek) {
+  const idx = parseInt(rowKey, 10);
+  if (!isNaN(idx) && rowsA[idx]) {
+    rowsA[idx][0] = kdRek;
+    rowsA[idx][1] = nmRek || '';
+    renderA();
+  }
+};
+
+// Callback dari DlgCariRekeningTahun
+window.setAkunDariDialog = function(kdRek, nmRek) {
+  let targetIdx = activeRowKeyA !== null ? parseInt(activeRowKeyA, 10) : -1;
+  if (targetIdx === -1 || !rowsA[targetIdx]) {
+    // Cari baris pertama yang kosong
+    targetIdx = rowsA.findIndex(r => !r[0]);
+    if (targetIdx === -1) {
+      addRowA();
+      targetIdx = rowsA.length - 1;
+    }
+  }
+  rowsA[targetIdx][0] = kdRek;
+  rowsA[targetIdx][1] = nmRek;
+  activeRowKeyA = null;
+  renderA();
+};
+
+function bukaCariRekeningDialog(idx) {
+  activeRowKeyA = (typeof idx === 'number' || typeof idx === 'string') ? idx : null;
+  if (window.javaApp && typeof javaApp.bukaCariRekening === 'function') {
+    javaApp.bukaCariRekening();
+  } else {
+    alert('Buka dialog cari rekening (di aplikasi terhubung ke DlgCariRekeningTahun).');
+  }
+}
+
+function isiSelisihA() {
+  let dCents = 0, kCents = 0;
+  for (let i = 0; i < rowsA.length; i++) {
+    dCents += Math.round((rowsA[i][2] || 0) * 100);
+    kCents += Math.round((rowsA[i][3] || 0) * 100);
+  }
+  const diffCents = dCents - kCents;
+  if (diffCents === 0) {
+    showToast('Jurnal sudah seimbang.', 'success');
+    return;
+  }
+
+  // Isi ke baris terakhir
+  const last = rowsA[rowsA.length - 1];
+  if (diffCents > 0) {
+    // Debet lebih besar -> tambahkan kredit
+    last[3] = diffCents / 100;
+    last[2] = 0;
+  } else {
+    // Kredit lebih besar -> tambahkan debet
+    last[2] = (-diffCents) / 100;
+    last[3] = 0;
+  }
+  renderA();
+}
+
+function calcA() {
+  let dCents = 0, kCents = 0;
+  let filledRows = 0;
+  let hasMissingAccount = false;
+
+  for (let i = 0; i < rowsA.length; i++) {
+    const deb = rowsA[i][2] || 0;
+    const kre = rowsA[i][3] || 0;
+    const kd = (rowsA[i][0] || '').trim();
+    if (deb > 0 || kre > 0) {
+      filledRows++;
+      dCents += Math.round(deb * 100);
+      kCents += Math.round(kre * 100);
+      if (!kd) hasMissingAccount = true;
+    }
+  }
+
+  const d = dCents / 100;
+  const k = kCents / 100;
+  const selisihCents = dCents - kCents;
+  const isBalanced = selisihCents === 0 && dCents > 0;
+  const isValid = isBalanced && filledRows >= 2 && !hasMissingAccount &&
+    !!$('aTgl').value && !!($('aKet').value || '').trim();
+
+  $('aD').innerHTML = rp(d);
+  $('aK').innerHTML = rp(k);
+
+  let statusText = '-';
+  let statusColor = 'var(--color-text-main)';
+
+  if (dCents === 0 && kCents === 0) {
+    statusText = 'Belum Ada Nilai';
+  } else if (hasMissingAccount) {
+    statusText = 'Lengkapi Akun COA';
+    statusColor = 'var(--color-kredit)';
+  } else if (selisihCents !== 0) {
+    statusText = 'Selisih Rp ' + rp(Math.abs(selisihCents) / 100);
+    statusColor = 'var(--color-kredit)';
+  } else {
+    statusText = 'Seimbang';
+    statusColor = 'var(--color-balanced)';
+  }
+
+  $('aS').innerHTML = statusText;
+  $('aS').style.color = statusColor;
+  $('aSimpan').disabled = isSavingA;
+}
+
+function onKeyCellA(e, rowIdx, colIdx) {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    if (colIdx === 0) {
+      // Kode -> Cari / Debet
+      setKodeA(rowIdx, e.target.value);
+      const debInput = document.querySelector('#tbA tr[data-idx="' + rowIdx + '"] .txt-deb');
+      if (debInput) debInput.focus();
+    } else if (colIdx === 2) {
+      // Debet -> Kredit
+      const kreInput = document.querySelector('#tbA tr[data-idx="' + rowIdx + '"] .txt-kre');
+      if (kreInput) kreInput.focus();
+    } else if (colIdx === 3) {
+      // Kredit -> Catatan
+      const ketInput = document.querySelector('#tbA tr[data-idx="' + rowIdx + '"] .txt-ket');
+      if (ketInput) ketInput.focus();
+    } else if (colIdx === 4) {
+      // Catatan -> Baris berikutnya atau baris baru
+      if (rowIdx + 1 < rowsA.length) {
+        const nextKd = document.querySelector('#tbA tr[data-idx="' + (rowIdx + 1) + '"] .txt-kd');
+        if (nextKd) nextKd.focus();
+      } else {
+        addRowA();
+      }
+    }
+  }
+}
+
+// Keyboard shortcuts (Ctrl+S untuk Simpan Jurnal)
+document.addEventListener('keydown', function(e) {
+  if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'S')) {
+    e.preventDefault();
+    if (TAB_AKTIF === 'A') {
+      simpanJurnalA();
+    }
+  }
+});
+
+let isSavingA = false;
+function simpanJurnalA() {
+  if (isSavingA) return;
+  calcA();
+
+  const tglVal = ($('aTgl').value || '').trim();
+  if (!tglVal) {
+    showToast('Tanggal transaksi belum diisi.', 'error');
+    $('aTgl').focus();
+    return;
+  }
+
+  const ketVal = ($('aKet').value || '').trim();
+  if (!ketVal) {
+    showToast('Keterangan transaksi belum diisi.', 'error');
+    $('aKet').focus();
+    return;
+  }
+
+  let dCents = 0, kCents = 0;
+  let filledRows = 0;
+  let hasMissingAccount = false;
+  const validDetails = [];
+
+  for (let i = 0; i < rowsA.length; i++) {
+    const r = rowsA[i];
+    const deb = r[2] || 0;
+    const kre = r[3] || 0;
+    const kd = (r[0] || '').trim();
+    if (deb > 0 || kre > 0) {
+      filledRows++;
+      dCents += Math.round(deb * 100);
+      kCents += Math.round(kre * 100);
+      if (!kd) {
+        hasMissingAccount = true;
+      }
+      validDetails.push({
+        kdRek: kd,
+        debet: deb,
+        kredit: kre,
+        keterangan: r[4] || ketVal
+      });
+    }
+  }
+
+  if (filledRows < 2) {
+    showToast('Jurnal minimal terdiri dari 2 baris transaksi (Debet dan Kredit).', 'error');
+    return;
+  }
+
+  if (hasMissingAccount) {
+    showToast('Kode rekening COA belum lengkap pada baris yang memiliki nilai debet/kredit.', 'error');
+    return;
+  }
+
+  const selisihCents = dCents - kCents;
+  if (selisihCents !== 0) {
+    showToast('Jurnal tidak seimbang! Total Debet dan Kredit harus sama (Selisih: Rp ' + rp(Math.abs(selisihCents) / 100) + ').', 'error');
+    return;
+  }
+
+  if (dCents <= 0) {
+    showToast('Nominal debet dan kredit harus lebih dari 0.', 'error');
+    return;
+  }
+
+  const payload = {
+    tanggal: tglVal,
+    noJurnal: ($('aNoJur').value || '').trim(),
+    noBukti: ($('aBukti').value || '').trim(),
+    jenis: $('aJenis').value,
+    keterangan: ketVal,
+    details: validDetails
+  };
+
+  isSavingA = true;
+  $('aSimpan').disabled = true;
+  $('aSimpan').innerHTML = 'Menyimpan...';
+
+  if (window.javaApp && typeof javaApp.simpanJurnal === 'function') {
+    javaApp.simpanJurnal(JSON.stringify(payload));
+  } else {
+    setTimeout(() => {
+      alert('Simpan (Mode Demo): ' + JSON.stringify(payload, null, 2));
+      resetFormAndRefresh();
+    }, 500);
+  }
+}
+
+// Callback reset form dari Java
+window.resetFormAndRefresh = function() {
+  isSavingA = false;
+  $('aNoJur').value = '';
+  $('aBukti').value = '';
+  $('aKet').value = '';
+  lepasKw();
+  rowsA = [
+    ['', '', 0, 0, ''],
+    ['', '', 0, 0, '']
+  ];
+  renderA();
+  generateNoJurnal();
+  $('aSimpan').innerHTML = '&#10003; SIMPAN JURNAL';
+  $('aSimpan').disabled = false;
+};
+
+// ============================================================
+// INTEGRASI TOMBOL KWITANSI (TAB A)
+// ============================================================
+function bukaKwitansiAction() {
+  if (window.javaApp && typeof javaApp.bukaKwitansi === 'function') {
+    javaApp.bukaKwitansi();
+  } else {
+    alert('Membuka dialog kwitansi kegiatan (DlgKwitansi).');
+  }
+}
+
+// Callback saat kwitansi dipilih dari Java
+window.terimaPilihKwitansi = function(kw) {
+  if (!kw) return;
+
+  // Cek apakah form sudah ada isinya
+  const hasContent = !!($('aBukti').value || $('aKet').value || rowsA.some(r => r[0] || r[2] > 0 || r[3] > 0));
+  if (hasContent) {
+    if (!confirm('Form input sudah berisi data. Apakah Anda ingin menimpa dengan data Kwitansi ' + kw.no_rekap + '?')) {
+      return;
+    }
+  }
+
+  if (kw.sudah_dijurnal) {
+    const conf = confirm('PERHATIAN: Kwitansi ' + kw.no_rekap + ' sudah memiliki jurnal (' + kw.no_jurnal_ada + ').\nTetap lanjut membuat jurnal lagi?');
+    if (!conf) return;
+  }
+
+  // Isi form
+  $('aTgl').value = kw.tgl_transaksi || todayStr();
+  generateNoJurnal();
+  $('aBukti').value = kw.no_rekap || '';
+  $('aKet').value = 'KWITANSI ' + (kw.no_rekap || '') + ' - ' + (kw.nama_tujuan || '') + ': ' + (kw.keterangan || '');
+
+  const total = parseFloat(kw.total_biaya) || 0;
+  rowsA = [
+    ['', '', total, 0, ''],
+    ['', '', 0, total, '']
+  ];
+  renderA();
+
+  // Tampilkan banner sumber
+  const s = $('srcK');
+  s.className = kw.sudah_dijurnal ? 'warn' : '';
+  s.style.display = 'block';
+
+  let bannerHtml = 'Sumber: <b>Kwitansi ' + esc(kw.no_rekap) + '</b> &middot; ' +
+    esc(kw.nama_tujuan) + ' &middot; <b>Rp ' + rp(total) + '</b> &middot; petugas ' + esc(kw.nama_petugas || kw.nip_petugas);
+  if (kw.sudah_dijurnal) {
+    bannerHtml += ' &middot; <b>PERHATIAN: sudah ada jurnal ' + esc(kw.no_jurnal_ada) + '</b>';
+  }
+  bannerHtml += ' &mdash; silakan pilih akun debet dan kredit pada tabel di bawah.<a onclick="lepasKw()">Lepas sumber</a>';
+
+  s.innerHTML = bannerHtml;
+  fit();
+};
+
+function lepasKw() {
+  $('srcK').style.display = 'none';
+  $('srcK').innerHTML = '';
+  $('srcK').className = '';
+  fit();
+}
+
+// ============================================================
+// TAB B, C, D: DAFTAR DATA, PAGINASI, SELEKSI & VALIDASI
+// ============================================================
+function muatDataTabAktif() {
+  const t1 = $('t1').value || todayStr();
+  const t2 = $('t2').value || t1;
+  const tab = TAB_AKTIF;
+  if (tab === 'A') return;
+
+  const st = $('fltStatus') ? $('fltStatus').value : 'Semua';
+  const kw = $('fltKeyword') ? $('fltKeyword').value.trim() : '';
+
+  if (tab === 'B') {
+    // Jurnal Manual via Java bridge loadTransaksiManualPage
+    const p = PAGING.B;
+    const offset = (p.page - 1) * p.pageSize;
+    $('tbL').innerHTML = '<tr><td colspan="9" class="c" style="padding:28px; color:var(--color-text-muted);">Memuat data Jurnal Manual...</td></tr>';
+
+    if (window.javaApp && typeof javaApp.loadTransaksiManualPage === 'function') {
+      javaApp.loadTransaksiManualPage(t1, t2, kw, 'semua', st, p.pageSize, offset);
+    } else {
+      setTimeout(() => {
+        DATA_LIST.B = [];
+        renderL();
+      }, 300);
+    }
+  } else if (tab === 'C' || tab === 'D') {
+    // Tab C (MASUK) & D (KELUAR) via Java bridge loadJurnalSumber
+    const sumber = tab === 'C' ? 'MASUK' : 'KELUAR';
+    const kat = $('fltKategori') ? $('fltKategori').value : 'Semua';
+    const bayar = (tab === 'C' && $('fltAkunBayar')) ? $('fltAkunBayar').value : 'Semua';
+    const p = PAGING[tab];
+
+    const filterObj = {
+      sumber: sumber,
+      tgl1: t1,
+      tgl2: t2,
+      statusPosting: st,
+      kategori: kat,
+      akunBayar: bayar,
+      keyword: kw,
+      page: p.page,
+      limit: p.pageSize
+    };
+
+    $('tbL').innerHTML = '<tr><td colspan="9" class="c" style="padding:28px; color:var(--color-text-muted);">Memuat data ' + (tab === 'C' ? 'Pemasukan Harian' : 'Pengeluaran Harian') + '...</td></tr>';
+
+    if (window.javaApp && typeof javaApp.loadJurnalSumber === 'function') {
+      javaApp.loadJurnalSumber(JSON.stringify(filterObj));
+    } else {
+      setTimeout(() => {
+        DATA_LIST[tab] = [];
+        renderL();
+      }, 300);
+    }
+  }
+}
+
+// Callback data Tab B (Jurnal Manual)
+window.ambilDataManual = function() {
+  try {
+    if (!window.javaApp) return;
+    const chunkCount = javaApp.getManualDataCount();
+    let jsonStr = '';
+    for (let i = 0; i < chunkCount; i++) {
+      jsonStr += javaApp.getManualDataChunk(i);
+    }
+    const res = JSON.parse(jsonStr);
+    const rawList = res.data || [];
+    PAGING.B.hasMore = !!res.hasMore;
+
+    // Transform rawList ke format transaksi ber-lines
+    const groups = [];
+    rawList.forEach((m, idx) => {
+      const id = 'manual_' + (m.no_jurnal || m.no_bukti || idx);
+      const lines = [];
+      const rincian = m.rincian_jurnal || [];
+      let totalDebet = 0, totalKredit = 0;
+
+      rincian.forEach(r => {
+        const d = parseFloat(r.debet) || 0;
+        const k = parseFloat(r.kredit) || 0;
+        totalDebet += d;
+        totalKredit += k;
+        lines.push({
+          tgl: m.tgl,
+          no_jurnal: m.no_jurnal || '-',
+          kd_rek: r.kd_rek || '',
+          nm_rek: r.nm_rek || '',
+          debet: d,
+          kredit: k,
+          no_bukti: m.no_bukti || '-',
+          status: m.status_validasi || 'Draft',
+          keterangan: r.keterangan || m.keterangan || ''
+        });
+      });
+
+      const headText = 'Jurnal Manual: ' + esc(m.keterangan || '-') + ' &middot; Akuntan: ' + esc(m.akuntan || '-');
+      groups.push({
+        id: id,
+        no_bukti: m.no_bukti || '',
+        no_jurnal: m.no_jurnal || '',
+        st: m.status_validasi || 'Draft',
+        head: headText,
+        lines: lines,
+        totalDebet: totalDebet,
+        totalKredit: totalKredit,
+        bt: false
+      });
+    });
+
+    DATA_LIST.B = groups;
+    PAGING.B.totalItems = groups.length;
+    LOADED_TAB.B = true;
+    renderL();
+  } catch (err) {
+    showAppError('Kesalahan Membaca Data Manual', err.message);
+  }
+};
+
+// Callback data Tab C & D (Sumber Pemasukan & Pengeluaran)
+window.terimaJurnalSumber = function(sumber, jsonString) {
+  try {
+    const tab = (sumber === 'MASUK') ? 'C' : 'D';
+    const rawLines = JSON.parse(jsonString) || [];
+
+    // Grouping by (tgl_jurnal, no_bukti)
+    const mapGrup = new Map();
+    rawLines.forEach(l => {
+      const grpKey = (l.tgl_jurnal || '') + '_' + (l.no_bukti || l.no_jurnal || '');
+      let g = mapGrup.get(grpKey);
+      if (!g) {
+        let headDesc = '';
+        if (tab === 'C') {
+          headDesc = 'PML: ' + esc(l.no_bukti) + ' &middot; ' + esc(l.kategori || 'Lain-lain') +
+            ' &middot; ' + esc(l.keperluan || '') + ' &middot; Petugas: ' + esc(l.petugas || '-');
+          if (l.akun_bayar) headDesc += ' &middot; Bayar: ' + esc(l.akun_bayar);
+        } else {
+          headDesc = 'PGL: ' + esc(l.no_bukti) + ' &middot; ' + esc(l.kategori || 'Pengeluaran') +
+            ' &middot; ' + esc(l.keperluan || '') + ' &middot; Petugas: ' + esc(l.petugas || '-');
+          if (l.akun_bayar) headDesc += ' &middot; Kwitansi: ' + esc(l.akun_bayar);
+        }
+
+        g = {
+          id: 'trx_' + grpKey,
+          no_bukti: l.no_bukti || '',
+          no_jurnal: l.no_jurnal || '',
+          st: l.status || 'Draft',
+          head: headDesc,
+          lines: [],
+          totalDebet: 0,
+          totalKredit: 0,
+          bt: false
+        };
+        mapGrup.set(grpKey, g);
+      }
+
+      const d = parseFloat(l.debet) || 0;
+      const k = parseFloat(l.kredit) || 0;
+      g.totalDebet += d;
+      g.totalKredit += k;
+      if (l.is_batal) g.bt = true;
+
+      g.lines.push({
+        tgl: l.tgl_jurnal,
+        no_jurnal: l.no_jurnal,
+        kd_rek: l.kd_rek,
+        nm_rek: l.nm_rek,
+        debet: d,
+        kredit: k,
+        no_bukti: l.no_bukti,
+        status: l.status,
+        is_batal: !!l.is_batal
+      });
+    });
+
+    DATA_LIST[tab] = Array.from(mapGrup.values());
+    LOADED_TAB[tab] = true;
+    renderL();
+  } catch (err) {
+    showAppError('Kesalahan Parsing Jurnal Sumber', err.message);
+  }
+};
+
+window.setInfoHalamanSumber = function(sumber, page, totalPages, totalTrx) {
+  const tab = (sumber === 'MASUK') ? 'C' : 'D';
+  PAGING[tab].page = page;
+  PAGING[tab].totalPages = totalPages;
+  PAGING[tab].totalItems = totalTrx;
+  updatePagerUI(tab);
+};
+
+function renderL() {
+  const tab = TAB_AKTIF;
+  if (tab === 'A') return;
+
+  const groups = DATA_LIST[tab] || [];
+  if (groups.length === 0) {
+    $('tbL').innerHTML = '<tr><td colspan="9" class="c" style="padding:35px; color:var(--color-text-muted);">Tidak ada data jurnal untuk periode / filter ini.</td></tr>';
+    $('all').checked = false;
+    calcL();
+    updatePagerUI(tab);
+    fit();
+    return;
+  }
+
+  const h = [];
+  for (let i = 0; i < groups.length; i++) {
+    const g = groups[i];
+    const isPickable = (g.st === 'Draft' || g.st === 'Manual');
+    const isChecked = !!SEL[g.id];
+
+    h.push(htmlKepalaGrup(g, tab, isChecked, isPickable));
+
+    for (let x = 0; x < g.lines.length; x++) {
+      h.push(htmlBarisAyat(g.lines[x], tab, g));
+    }
+  }
+
+  $('tbL').innerHTML = h.join('');
+  updatePagerUI(tab);
+  calcL();
+  fit();
+}
+
+function updatePagerUI(tab) {
+  const p = PAGING[tab];
+  if (!p) return;
+  $('infoPagerL').innerHTML = 'Halaman ' + p.page + ' dari ' + Math.max(1, p.totalPages) + ' (' + p.totalItems + ' Transaksi)';
+  $('btnPrevL').disabled = (p.page <= 1);
+  $('btnNextL').disabled = (tab === 'B' ? !p.hasMore : p.page >= p.totalPages);
+}
+
+function ubahHalamanL(delta) {
+  const tab = TAB_AKTIF;
+  const p = PAGING[tab];
+  if (!p) return;
+  const newPage = p.page + delta;
+  if (newPage < 1) return;
+
+  // Reset pilihan dengan konfirmasi bila ada yang terpilih
+  let countSelected = 0;
+  for (const k in SEL) {
+    if (SEL[k]) countSelected++;
+  }
+  if (countSelected > 0) {
+    if (!confirm('Ada ' + countSelected + ' transaksi terpilih. Berpindah halaman akan mereset pilihan. Lanjutkan?')) {
+      return;
+    }
+  }
+  SEL = {};
+
+  p.page = newPage;
+  muatDataTabAktif();
+}
+
+function pickL(id, val) {
+  SEL[id] = !!val;
+  calcL();
+}
+
+function toggleAllL(val) {
+  const tab = TAB_AKTIF;
+  const groups = DATA_LIST[tab] || [];
+  for (let i = 0; i < groups.length; i++) {
+    const g = groups[i];
+    if (g.st === 'Draft' || g.st === 'Manual') {
+      SEL[g.id] = !!val;
+    }
+  }
+  renderL();
+}
+
+function calcL() {
+  const tab = TAB_AKTIF;
+  const groups = DATA_LIST[tab] || [];
+  let n = 0;
+  let dCents = 0, kCents = 0;
+  let bad = 0;
+
+  for (let i = 0; i < groups.length; i++) {
+    const g = groups[i];
+    if (!SEL[g.id]) continue;
+    n++;
+    const gdCents = Math.round(g.totalDebet * 100);
+    const gkCents = Math.round(g.totalKredit * 100);
+    dCents += gdCents;
+    kCents += gkCents;
+    if (gdCents !== gkCents) bad++;
+  }
+
+  htmlBarTotal(n, dCents / 100, kCents / 100, bad);
+}
+
+let isPostingL = false;
+function validasiTerpilihL() {
+  if (isPostingL) return;
+  const tab = TAB_AKTIF;
+  const groups = DATA_LIST[tab] || [];
+  const selectedGroups = groups.filter(g => SEL[g.id]);
+
+  if (selectedGroups.length === 0) {
+    showToast('Pilih setidaknya satu transaksi untuk divalidasi.', 'error');
+    return;
+  }
+
+  isPostingL = true;
+  if (tab === 'B') {
+    // Validasi Tab B (Jurnal Manual)
+    const items = selectedGroups.map(g => ({
+      no_bukti: g.no_bukti,
+      no_jurnal: g.no_jurnal
+    }));
+    const payload = { items: items };
+
+    $('bV').disabled = true;
+    $('bV').innerHTML = 'Memvalidasi...';
+
+    if (window.javaApp && typeof javaApp.validasiJurnalUmumManual === 'function') {
+      javaApp.validasiJurnalUmumManual(JSON.stringify(payload));
+    } else {
+      setTimeout(() => {
+        alert('Validasi Manual Demo: ' + items.length + ' transaksi.');
+        terimaHasilValidasiManual(true, 'Berhasil validasi demo', items.length);
+      }, 500);
+    }
+  } else if (tab === 'C' || tab === 'D') {
+    // Validasi Tab C & D (Sumber)
+    const noJurnals = [];
+    selectedGroups.forEach(g => {
+      // Ambil no_jurnal dari lines yang unik
+      g.lines.forEach(l => {
+        if (l.no_jurnal && !noJurnals.includes(l.no_jurnal)) {
+          noJurnals.push(l.no_jurnal);
+        }
+      });
+    });
+
+    $('bV').disabled = true;
+    $('bV').innerHTML = 'Memvalidasi...';
+
+    if (window.javaApp && typeof javaApp.validasiJurnalSumber === 'function') {
+      javaApp.validasiJurnalSumber(JSON.stringify(noJurnals));
+    } else {
+      setTimeout(() => {
+        alert('Validasi Sumber Demo: ' + noJurnals.length + ' jurnal.');
+        terimaHasilValidasiSumber(true, 'Berhasil validasi sumber demo', noJurnals.length);
+      }, 500);
+    }
+  }
+}
+
+// Callback hasil validasi Manual dari Java
+window.terimaHasilValidasiManual = function(sukses, pesan, jml) {
+  isPostingL = false;
+  $('bV').innerHTML = '&#10003; VALIDASI TERPILIH';
+  if (sukses) {
+    showToast(pesan || 'Berhasil memvalidasi ' + jml + ' transaksi!', 'success');
+    SEL = {};
+    muatDataTabAktif();
+  } else {
+    showAppError('Gagal Validasi Jurnal Manual', pesan);
+    calcL();
+  }
+};
+
+// Callback hasil validasi Sumber dari Java
+window.terimaHasilValidasiSumber = function(sukses, pesan, jml) {
+  isPostingL = false;
+  $('bV').innerHTML = '&#10003; VALIDASI TERPILIH';
+  if (sukses) {
+    showToast(pesan || 'Berhasil memvalidasi ' + jml + ' transaksi!', 'success');
+    SEL = {};
+    muatDataTabAktif();
+  } else {
+    showAppError('Gagal Validasi Jurnal Sumber', pesan);
+    calcL();
+  }
+};
+
+// ============================================================
+// RESIZABLE TABLE COLUMNS (Pola initResizable dari Jurnal Transaksi)
+// ============================================================
+function bekukanKolom(tbl) {
+  const ths = tbl.getElementsByTagName('th');
+  let tot = 0;
+  for (let i = 0; i < ths.length; i++) {
+    let w = ths[i].offsetWidth;
+    if (w < 30) w = 30;
+    ths[i].style.width = w + 'px';
+    tot += w;
+  }
+  tbl.style.width = tot + 'px';
+  tbl.style.minWidth = '100%';
+}
+
+function aturLebar(tbl, th, nw) {
+  const cur = parseFloat(th.style.width) || th.offsetWidth;
+  const tot = parseFloat(tbl.style.width) || tbl.offsetWidth;
+  if (nw < 30) nw = 30;
+  th.style.width = nw + 'px';
+  tbl.style.width = (tot + nw - cur) + 'px';
+}
+
+function fitKolom(tbl, th) {
+  const idx = th.cellIndex;
+  const rows = tbl.getElementsByTagName('tr');
+  let mx = th.scrollWidth;
+  for (let i = 0; i < rows.length; i++) {
+    if (rows[i].className.indexOf('grp') !== -1) continue;
+    const c = rows[i].cells[idx];
+    if (c && c.colSpan === 1 && c.scrollWidth > mx) mx = c.scrollWidth;
+  }
+  aturLebar(tbl, th, Math.min(mx + 8, 600));
+}
+
+function initResizable(wrapId) {
+  const wrap = $(wrapId);
+  if (!wrap) return;
+  const tbl = wrap.getElementsByTagName('table')[0];
+  if (!tbl) return;
+  const ths = tbl.getElementsByTagName('th');
+  bekukanKolom(tbl);
+  for (let i = 0; i < ths.length; i++) {
+    if (i === 0) continue; // checkbox jangan di-resize
+    if (ths[i].querySelector('.resizer')) continue;
+    (function(th) {
+      const r = document.createElement('div');
+      r.className = 'resizer';
+      th.appendChild(r);
+      r.ondblclick = function(e) {
+        fitKolom(tbl, th);
+        e.stopPropagation();
+      };
+      r.onmousedown = function(e) {
+        const x0 = e.clientX;
+        const w0 = th.offsetWidth;
+        document.onmousemove = function(ev) {
+          aturLebar(tbl, th, w0 + ev.clientX - x0);
+        };
+        document.onmouseup = function() {
+          document.onmousemove = null;
+          document.onmouseup = null;
+        };
+        e.stopPropagation();
+        e.preventDefault();
+      };
+    })(ths[i]);
+  }
+}
+
+// ============================================================
+// HEADER ACTIONS & DIALOG BRIDGE KHANZA
+// ============================================================
+function minApp() { if (window.javaApp) javaApp.minimize(); }
+function maxApp() { if (window.javaApp) javaApp.toggleMaximize(); }
+function keluarApp() { if (window.javaApp) javaApp.keluarForm(); else alert('Tutup form.'); }
+function bukaBukuBesar() { if (window.javaApp) javaApp.bukaBukuBesar(); }
+function bukaMappingCOA() { if (window.javaApp) javaApp.bukaMappingCOA(); }
+function bukaNeracaSaldo() { if (window.javaApp) javaApp.bukaNeracaSaldo(); }
+
+function generateNoJurnal() {
+  const tglEl = $('aTgl');
+  const tgl = (tglEl && tglEl.value) ? tglEl.value : todayStr();
+  if (tgl && tgl.length >= 10) {
+    if (window.javaApp && typeof javaApp.autoNomor === 'function') {
+      javaApp.autoNomor(tgl);
+    } else {
+      $('aNoJur').value = 'JM' + tgl.substring(0, 10).replace(/-/g, '') + '000001';
+    }
+  }
+}
+
+// Callback autoNomor dari Java
+window.setNoJurnal = function(no) {
+  if (no) $('aNoJur').value = no;
+};
+
+// Callback tanggal hari ini dari Java
+window.setTanggalHariIni = function() {
+  let today = todayStr();
+  if (window.javaApp && typeof javaApp.getTanggalHariIni === 'function') {
+    try {
+      const t = javaApp.getTanggalHariIni();
+      if (t) today = t;
+    } catch(e) {}
+  }
+  $('t1').value = today;
+  $('t2').value = today;
+  $('aTgl').value = today;
+};
+
+// UI Notifikasi & Modal
+function showToast(msg, type) {
+  const t = $('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + (type || '');
+  setTimeout(() => { t.className = 'toast'; }, 3500);
+}
+
+function showAppError(title, msg) {
+  isSavingA = false;
+  isPostingL = false;
+  if ($('aSimpan')) {
+    $('aSimpan').innerHTML = '&#10003; SIMPAN JURNAL';
+    calcA();
+  }
+  if ($('bV')) {
+    $('bV').innerHTML = '&#10003; VALIDASI TERPILIH';
+    calcL();
+  }
+  $('modalErrTitle').textContent = title || 'Kesalahan';
+  $('modalErrBody').textContent = msg || 'Detail error tidak tersedia.';
+  $('errorModal').classList.add('active');
+  showToast(title, 'error');
+}
+
+function tutupErrorModal() {
+  $('errorModal').classList.remove('active');
+}
+
+function salinError() {
+  const text = $('modalErrBody').textContent;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text);
+    showToast('Pesan error disalin ke clipboard!', 'success');
+  }
+}
+
+// ============================================================
+// INISIALISASI
+// ============================================================
+function init() {
+  setTanggalHariIni();
+  renderTabsNav();
+  renderA();
+  initResizable('wrapA');
+
+  // Muat user info dari Java
+  if (window.javaApp && typeof javaApp.getUserInfo === 'function') {
+    try {
+      const u = javaApp.getUserInfo();
+      if (u) $('lblUserInfo').textContent = 'Akuntan: ' + u;
+    } catch(e) {}
+  }
+
+  generateNoJurnal();
+  if ($('aSimpan')) {
+    $('aSimpan').disabled = false;
+    $('aSimpan').innerHTML = '&#10003; SIMPAN JURNAL';
+  }
+  fit();
+}
+
+window.onload = init;
+</script>
+</body>
+</html>
