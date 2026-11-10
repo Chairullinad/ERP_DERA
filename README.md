@@ -5,6 +5,7 @@ Repositori kustomisasi modul ERP & SIMRS karya Dessy Rahmawati Chairullina (chai
 ## Daftar Modul
 
 ### 1. Modul Keuangan (Jasa Medis & Billing Pasien)
+- **src/keuangan/KeuanganPiutangBelumLunasBPJS.java & .form**: Monitoring dan penagihan piutang BPJS Kesehatan, kalkulasi otomatis lebih/kurang bayar (selisih klaim INA-CBG vs piutang RS), penyajian Biaya Riil RS, dan rekonsiliasi klaim.
 - **src/keuangan/DlgDetailHarianPasien.java & .form**: Dialog rincian harian pasien dan buku bantu JM BPJS.
 - **src/keuangan/DlgRincianJMBPJS.java**: Dialog breakdown dan analisis klaim / tarif INA-CBG dan jasa medis.
 - **src/keuangan/DlgSetAturanJMBPJS.java & .form**: Master pengaturan dinamis 39 aturan klaim/pembagian jasa medis BPJS.
